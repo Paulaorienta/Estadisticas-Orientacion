@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparativo 2025-2026 — Programa de Orientación PDV</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAF8F2; color: #141414; padding: 32px 24px; }
+  .page { max-width: 1180px; margin: 0 auto; }
+  .header { background: #F2B705; color: #141414; padding: 20px 28px; border-radius: 12px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .header-title { font-size: 18px; font-weight: 800; }
+  .header-sub { font-size: 14px; font-weight: 600; opacity: .88; margin-top: 4px; }
+  .header-period { font-size: 14px; background: #C9900A; color: #141414; padding: 7px 18px; border-radius: 6px; font-weight: 800; letter-spacing: .2px; white-space: nowrap; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .section { background: #fff; border: 1px solid #EAE3D2; border-radius: 14px; padding: 20px 22px 22px; margin-bottom: 20px; }
+  .section-title { font-size: 15px; font-weight: 700; color: #141414; margin-bottom: 4px; }
+  .section-note { font-size: 12px; color: #726C5C; margin-bottom: 12px; font-style: italic; }
+  .kpi-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .kpi { background: #FAF8F2; border: 1px solid #EAE3D2; border-left: 4px solid #F2B705; border-radius: 8px; padding: 8px 14px; flex: 1; min-width: 120px; }
+  .kpi.acc-gold { border-left-color: #C9900A; }
+  .kpi.acc-teal { border-left-color: #1F4E4A; }
+  .kpi-label { font-size: 10px; color: #726C5C; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 2px; }
+  .kpi-value { font-size: 19px; font-weight: 800; color: #141414; }
+  .kpi-delta { font-size: 11px; color: #726C5C; font-weight: 600; margin-left: 4px; }
+  .chart-wrap { position: relative; width: 100%; height: 250px; }
+  .footer { margin-top: 8px; text-align: center; font-size: 11.5px; color: #a39d8a; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div>
+      <div class="header-title">Programa de Orientación — Preuniversitario Pedro de Valdivia</div>
+      <div class="header-sub">Comparativo interanual 2025 vs 2026</div>
+    </div>
+    <div class="header-period">Postulaciones + Enero a Julio</div>
+  </div>
+
+  <div class="grid">
+    <div class="section">
+      <div class="section-title">Atenciones individuales</div>
+      <div class="section-note">Solicitadas (2025) vs. registradas (2026)</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">1.969</div></div>
+        <div class="kpi acc-teal"><div class="kpi-label">Total 2026</div><div class="kpi-value">3.253 <span class="kpi-delta">▲ +65,2%</span></div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="c_atenciones"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Prematrícula — atendidas</div>
+      <div class="section-note">Casos de prematrícula atendidos por mes (no incluye matriculados: ese seguimiento no existía en 2025)</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">188</div></div>
+        <div class="kpi acc-teal"><div class="kpi-label">Total 2026</div><div class="kpi-value">192 <span class="kpi-delta">▲ +2,1%</span></div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="c_prematricula"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Mensajería (Consultas)</div>
+      <div class="section-note">Consultas respondidas por mes</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">3.367</div></div>
+        <div class="kpi acc-gold"><div class="kpi-label">Total 2026</div><div class="kpi-value">3.144 <span class="kpi-delta">▼ -6,6%</span></div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="c_mensajeria"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="section-title">WhatsApp — mensajes enviados</div>
+      <div class="section-note">2025 comienza en abril (canal no usado antes). 2026 solo tiene registro hasta mayo en la fuente disponible; Junio y Julio 2026 no están reportados aún.</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total 2025 (Abr-Jul)</div><div class="kpi-value">1.828</div></div>
+        <div class="kpi acc-teal"><div class="kpi-label">Total 2026 (Ene-May)</div><div class="kpi-value">1.269</div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="c_whatsapp"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Talleres — cantidad</div>
+      <div class="section-note">N° de talleres dictados (estudiantes + apoderados)</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">412</div></div>
+        <div class="kpi acc-gold"><div class="kpi-label">Total 2026</div><div class="kpi-value">200 <span class="kpi-delta">▼ -51,5%</span></div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="c_talleres_cant"></canvas></div>
+    </div>
+    <div class="section" style="grid-column: 1 / -1;">
+      <div class="section-title">Talleres — % de asistencia</div>
+      <div class="section-note">Asistentes ÷ Inscritos, por mes.</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-label">% Asistencia 2025</div><div class="kpi-value">31,7%</div></div>
+        <div class="kpi acc-gold"><div class="kpi-label">% Asistencia 2026</div><div class="kpi-value">38,3% <span class="kpi-delta">▲ +6,6 pts</span></div></div>
+      </div>
+      <div class="chart-wrap"><canvas id="c_talleres_pct"></canvas></div>
+    </div>
+  </div>
+
+  <div class="footer">Fuentes: RESUMEN ATENCIONES/HORAS 2025 · RESUMEN ATENCIONES 2026 · Consolidado Estadísticas Equipo 2026 · Programa de Orientación PDV · Actualizado 07-08-2026</div>
+</div>
+
+<script>
+const labels = ["Postulaciones","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio"];
+const labels7 = ["Postulaciones","Enero","Febrero","Marzo","Abril","Mayo","Junio"];
+
+const atenciones2025 = [305, 49, 23, 161, 285, 293, 350, 503];
+const atenciones2026 = [435, 94, 68, 255, 695, 550, 571, 585];
+
+const mensajeria2025 = [178, 72, 79, 383, 878, 590, 590, 597];
+const mensajeria2026 = [97, 40, 75, 369, 933, 636, 567, 427];
+
+const talleresCant2025 = [12, 20, 15, 68, 97, 76, 51, 73];
+const talleresCant2026 = [13, 8, 13, 31, 44, 32, 28, 31];
+
+const talleresPct2025 = [44.0, 41.4, 34.5, 36.8, 31.2, 29.8, 27.2, 32.0];
+const talleresPct2026 = [45.7, 42.7, 35.1, 45.4, 35.4, 36.6, 33.9, 35.0];
+
+// WhatsApp: 2025 recién parte en abril; 2026 la fuente disponible solo llega a mayo (sin Junio/Julio aún)
+const whatsapp2025 = [null, null, null, null, 41, 73, 255, 1459];
+const whatsapp2026 = [null, 177, 97, 260, 326, 409, null, null];
+
+const prematricula2025 = [0, 74, 47, 44, 10, 7, 6];
+const prematricula2026 = [0, 46, 53, 72, 10, 7, 4];
+
+const colorA = '#a39d8a'; // 2025 (neutro institucional)
+
+function barChart(canvasId, s2025, s2026, colorB, pctSuffix, chartLabels) {
+  new Chart(document.getElementById(canvasId), {
+    type: 'bar',
+    data: {
+      labels: chartLabels || labels,
+      datasets: [
+        { label: '2025', data: s2025, backgroundColor: colorA, borderRadius: 3, maxBarThickness: 26 },
+        { label: '2026', data: s2026, backgroundColor: colorB, borderRadius: 3, maxBarThickness: 26 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 14, color: '#4a4a46' } },
+        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.parsed.y}${pctSuffix?'%':''}` } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { color: '#726C5C', font: { size: 10 }, callback: (v)=> pctSuffix ? v+'%' : v }, grid: { color: '#EAE3D2' } },
+        x: { ticks: { color: '#726C5C', font: { size: 10 } }, grid: { display: false } }
+      }
+    },
+    plugins: [{
+      id: 'dataLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, dsIndex) => {
+          ds.data.forEach((value, i) => {
+            if (value === null || value === undefined) return;
+            const bar = chart.getDatasetMeta(dsIndex).data[i];
+            ctx.save();
+            ctx.fillStyle = '#141414';
+            ctx.font = '600 9.5px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(value + (pctSuffix?'%':''), bar.x, bar.y - 3);
+            ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+}
+
+barChart('c_atenciones', atenciones2025, atenciones2026, '#1F4E4A', false);
+barChart('c_mensajeria', mensajeria2025, mensajeria2026, '#F2B705', false);
+barChart('c_talleres_cant', talleresCant2025, talleresCant2026, '#C9900A', false);
+barChart('c_whatsapp', whatsapp2025, whatsapp2026, '#1F4E4A', false);
+barChart('c_prematricula', prematricula2025, prematricula2026, '#1F4E4A', false, labels7);
+barChart('c_talleres_pct', talleresPct2025, talleresPct2026, '#C9900A', true);
+</script>
+</body>
+</html>

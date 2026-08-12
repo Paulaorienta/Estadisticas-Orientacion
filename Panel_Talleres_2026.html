@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Talleres 2026 — Programa de Orientación PDV</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAF8F2; color: #141414; padding: 32px 24px; }
+  .page { max-width: 1140px; margin: 0 auto; }
+  .header { background: #F2B705; color: #141414; padding: 20px 28px; border-radius: 12px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .header-title { font-size: 18px; font-weight: 800; }
+  .header-sub { font-size: 14px; font-weight: 600; opacity: .88; margin-top: 4px; }
+  .header-period { font-size: 14px; background: #C9900A; color: #141414; padding: 7px 18px; border-radius: 6px; font-weight: 800; letter-spacing: .2px; }
+  .kpi-row { display: flex; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+  .kpi { background: #FFFFFF; border: 1px solid #EAE3D2; border-left: 4px solid #F2B705; border-radius: 10px; padding: 14px 22px; min-width: 150px; flex: 1; }
+  .kpi-label { font-size: 11.5px; color: #726C5C; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+  .kpi-value { font-size: 26px; font-weight: 800; }
+  .section { background: #fff; border: 1px solid #EAE3D2; border-radius: 14px; padding: 22px 26px 26px; margin-bottom: 22px; }
+  .section-title { font-size: 15px; font-weight: 700; color: #141414; margin-bottom: 4px; }
+  .section-note { font-size: 12px; color: #726C5C; margin-bottom: 14px; }
+  .chart-wrap { position: relative; width: 100%; }
+  .legend-inline { display:flex; gap:16px; font-size:12px; color:#726C5C; margin-bottom:12px; align-items:center; flex-wrap:wrap; }
+  .legend-chip { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-1px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: center; padding: 9px 8px; background: #FFF3CF; color: #4a4a46; font-weight: 700; cursor: pointer; user-select:none; }
+  th:first-child, th:nth-child(2) { text-align: left; }
+  td { text-align: center; padding: 8px; border-bottom: 1px solid #EAE3D2; }
+  td:first-child, td:nth-child(2) { text-align: left; }
+  tr:hover td { background: #FFF9E6; }
+  .mes-chip { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; vertical-align:1px; }
+  .pivot-table td:first-child { font-weight: 600; }
+  .pivot-table td.total { font-weight: 800; background: #FFF3CF; }
+  .pivot-table th.total { background: #F2B705; }
+  .footer { margin-top: 8px; text-align: center; font-size: 11.5px; color: #a39d8a; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <div class="header-title">Evolución Talleres 2026</div>
+      <div class="header-sub">Programa de Orientación — Preuniversitario Pedro de Valdivia</div>
+    </div>
+    <div class="header-period">Postulaciones – Julio 2026</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Talleres realizados</div><div class="kpi-value">214</div></div>
+    <div class="kpi"><div class="kpi-label">Inscritos</div><div class="kpi-value">5,766</div></div>
+    <div class="kpi"><div class="kpi-label">Asistentes</div><div class="kpi-value">2,212</div></div>
+    <div class="kpi"><div class="kpi-label">% Asistencia</div><div class="kpi-value">38.4%</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Evolución del % de asistencia</div>
+    <div class="chart-wrap" style="height:300px;"><canvas id="chartEvolucion"></canvas></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Ranking de temas por % de asistencia</div>
+    <div class="section-note">Suma todos los meses en que se dictó cada tema. Las barras más claras tienen menos de 20 inscritos — su % es poco confiable por el tamaño de muestra pequeño (n). Léelas con cautela, no las compares directo con las de mayor convocatoria.</div>
+    <div class="chart-wrap" id="rankingWrap" style="height:520px;"><canvas id="chartRanking"></canvas></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Detalle por tema y audiencia</div>
+    <div class="legend-inline" id="mesLegend"></div>
+    <div class="section-note">Clic en cualquier columna para ordenar</div>
+    <table>
+      <thead><tr>
+        <th onclick="sortBy('mes')">Mes</th>
+        <th onclick="sortBy('tema')">Tema</th>
+        <th onclick="sortBy('audiencia')">Audiencia</th>
+        <th onclick="sortBy('cantidad')">N° Talleres</th>
+        <th onclick="sortBy('inscritos')">Inscritos</th>
+        <th onclick="sortBy('asistentes')">Asistentes</th>
+        <th onclick="sortBy('pct')">% Asistencia</th>
+      </tr></thead>
+      <tbody id="tbody_detalle"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">Datos del Consolidado del equipo de orientación · Para reflejar cambios, pide una actualización en esta misma conversación</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DETALLE = [{"mes": "Marzo", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Apoderados", "cantidad": 6, "inscritos": 178.0, "asistentes": 54.0, "pct": 30.3}, {"mes": "Marzo", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Estudiantes", "cantidad": 18, "inscritos": 921.0, "asistentes": 497.0, "pct": 54.0}, {"mes": "Marzo", "tema": "Conoce la Inscripción PAES", "audiencia": "Estudiantes", "cantidad": 5, "inscritos": 125.0, "asistentes": 39.0, "pct": 31.2}, {"mes": "Marzo", "tema": "Como Solicitar tus ajustes PAES", "audiencia": "Estudiantes", "cantidad": 1, "inscritos": 31.0, "asistentes": 11.0, "pct": 35.5}, {"mes": "Marzo", "tema": "Cómo Funciona la Admisión Universitaria", "audiencia": "Apoderados", "cantidad": 2, "inscritos": 100.0, "asistentes": 16.0, "pct": 16.0}, {"mes": "Febrero", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Estudiantes", "cantidad": 7, "inscritos": 396.0, "asistentes": 182.0, "pct": 46.0}, {"mes": "Febrero", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Apoderados", "cantidad": 6, "inscritos": 245.0, "asistentes": 69.0, "pct": 28.2}, {"mes": "Febrero", "tema": "Cómo Funciona la Admisión Universitaria", "audiencia": "Apoderados", "cantidad": 6, "inscritos": 251.0, "asistentes": 62.0, "pct": 24.7}, {"mes": "Enero", "tema": "Cómo Funciona la Admisión Universitaria", "audiencia": "Apoderados", "cantidad": 2, "inscritos": 53.0, "asistentes": 15.0, "pct": 28.3}, {"mes": "Enero", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Estudiantes", "cantidad": 6, "inscritos": 109.0, "asistentes": 63.0, "pct": 57.8}, {"mes": "Enero", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Apoderados", "cantidad": 2, "inscritos": 72.0, "asistentes": 22.0, "pct": 30.6}, {"mes": "Marzo", "tema": "Explora tus Intereses con el TIAL", "audiencia": "Estudiantes", "cantidad": 3, "inscritos": 31.0, "asistentes": 12.0, "pct": 38.7}, {"mes": "Postulaciones", "tema": "Tu Postulación Paso a Paso", "audiencia": "Estudiantes", "cantidad": 8, "inscritos": 76.0, "asistentes": 37.0, "pct": 48.7}, {"mes": "Postulaciones", "tema": "Conoce la Selección y matricula universitaria", "audiencia": "Estudiantes", "cantidad": 5, "inscritos": 62.0, "asistentes": 26.0, "pct": 41.9}, {"mes": "Abril", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Estudiantes", "cantidad": 6, "inscritos": 94.0, "asistentes": 39.0, "pct": 41.5}, {"mes": "Abril", "tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Apoderados", "cantidad": 2, "inscritos": 99.0, "asistentes": 15.0, "pct": 15.2}, {"mes": "Abril", "tema": "Define tus Metas", "audiencia": "Estudiantes", "cantidad": 12, "inscritos": 354.0, "asistentes": 116.0, "pct": 32.8}, {"mes": "Abril", "tema": "Activa tu Motivación", "audiencia": "Estudiantes", "cantidad": 9, "inscritos": 244.0, "asistentes": 88.0, "pct": 36.1}, {"mes": "Abril", "tema": "Explora tus Intereses con el TIAL", "audiencia": "Estudiantes", "cantidad": 6, "inscritos": 133.0, "asistentes": 60.0, "pct": 45.1}, {"mes": "Abril", "tema": "Inicia tu Camino Vocacional", "audiencia": "Estudiantes", "cantidad": 10, "inscritos": 170.0, "asistentes": 69.0, "pct": 40.6}, {"mes": "Mayo", "tema": "Organiza tu Semana Académica", "audiencia": "Estudiantes", "cantidad": 6, "inscritos": 318.0, "asistentes": 119.0, "pct": 37.4}, {"mes": "Mayo", "tema": "Como Solicitar tus ajustes PAES", "audiencia": "Estudiantes", "cantidad": 5, "inscritos": 78.0, "asistentes": 30.0, "pct": 38.5}, {"mes": "Mayo", "tema": "PAES Invierno: Prioriza y Avanza en el Tramo Final", "audiencia": "Estudiantes", "cantidad": 4, "inscritos": 138.0, "asistentes": 46.0, "pct": 33.3}, {"mes": "Mayo", "tema": "Convierte el Error en Aprendizaje", "audiencia": "Estudiantes", "cantidad": 10, "inscritos": 282.0, "asistentes": 108.0, "pct": 38.3}, {"mes": "Mayo", "tema": "Explora tus Intereses con el TIAL", "audiencia": "Estudiantes", "cantidad": 6, "inscritos": 64.0, "asistentes": 25.0, "pct": 39.1}, {"mes": "Mayo", "tema": "Cómo acompañar hacia la Educación Superior", "audiencia": "Apoderados", "cantidad": 2, "inscritos": 49.0, "asistentes": 12.0, "pct": 24.5}, {"mes": "Junio", "tema": "Conoce la Inscripción PAES", "audiencia": "Estudiantes", "cantidad": 15, "inscritos": 214.0, "asistentes": 75.0, "pct": 35.0}, {"mes": "Junio", "tema": "Cómo Funciona la Admisión Universitaria", "audiencia": "Apoderados", "cantidad": 2, "inscritos": 41.0, "asistentes": 8.0, "pct": 19.5}, {"mes": "Junio", "tema": "Activa tu Lectura Estratégica", "audiencia": "Estudiantes", "cantidad": 5, "inscritos": 158.0, "asistentes": 47.0, "pct": 29.7}, {"mes": "Junio", "tema": "Regula tu Ansiedad", "audiencia": "Estudiantes", "cantidad": 3, "inscritos": 15.0, "asistentes": 12.0, "pct": 80.0}, {"mes": "Junio", "tema": "Como Solicitar tus ajustes PAES", "audiencia": "Estudiantes", "cantidad": 1, "inscritos": 6.0, "asistentes": 2.0, "pct": 33.3}, {"mes": "Junio", "tema": "Inscripción PAES regular", "audiencia": "Profesores", "cantidad": 3, "inscritos": 8.0, "asistentes": 6.0, "pct": 75.0}, {"mes": "Julio", "tema": "Conoce la Inscripción PAES", "audiencia": "Estudiantes", "cantidad": 9, "inscritos": 93.0, "asistentes": 33.0, "pct": 35.5}, {"mes": "Julio", "tema": "Transforma la Frustración en Avance", "audiencia": "Estudiantes", "cantidad": 5, "inscritos": 108.0, "asistentes": 40.0, "pct": 37.0}, {"mes": "Julio", "tema": "Como Solicitar tus ajustes PAES", "audiencia": "Estudiantes", "cantidad": 2, "inscritos": 19.0, "asistentes": 8.0, "pct": 42.1}, {"mes": "Julio", "tema": "Programa de Orientación Logra tu Máximo", "audiencia": "Estudiantes", "cantidad": 5, "inscritos": 192.0, "asistentes": 55.0, "pct": 28.6}, {"mes": "Julio", "tema": "Estudia con Estrategia", "audiencia": "Estudiantes", "cantidad": 8, "inscritos": 238.0, "asistentes": 93.0, "pct": 39.1}, {"mes": "Julio", "tema": "Explora tus Intereses con el TIAL", "audiencia": "Estudiantes", "cantidad": 1, "inscritos": 1.0, "asistentes": 1.0, "pct": 100.0}];
+const PIVOT = {"meses": ["Postulaciones", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio"]};
+const EVOLUCION = [{"mes": "Postulaciones", "pct": 45.7}, {"mes": "Enero", "pct": 42.7}, {"mes": "Febrero", "pct": 35.1}, {"mes": "Marzo", "pct": 45.4}, {"mes": "Abril", "pct": 35.4}, {"mes": "Mayo", "pct": 36.6}, {"mes": "Junio", "pct": 33.9}, {"mes": "Julio", "pct": 35.3}];
+const RANKING = [{"tema": "Regula tu Ansiedad", "audiencia": "Estudiantes", "pct": 80.0, "n": 15}, {"tema": "Inscripción PAES regular", "audiencia": "Profesores", "pct": 75.0, "n": 8}, {"tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Estudiantes", "pct": 51.4, "n": 1520}, {"tema": "Tu Postulación Paso a Paso", "audiencia": "Estudiantes", "pct": 48.7, "n": 76}, {"tema": "Explora tus Intereses con el TIAL", "audiencia": "Estudiantes", "pct": 42.8, "n": 229}, {"tema": "Conoce la Selección y matricula universitaria", "audiencia": "Estudiantes", "pct": 41.9, "n": 62}, {"tema": "Inicia tu Camino Vocacional", "audiencia": "Estudiantes", "pct": 40.6, "n": 170}, {"tema": "Estudia con Estrategia", "audiencia": "Estudiantes", "pct": 39.1, "n": 238}, {"tema": "Convierte el Error en Aprendizaje", "audiencia": "Estudiantes", "pct": 38.3, "n": 282}, {"tema": "Como Solicitar tus ajustes PAES", "audiencia": "Estudiantes", "pct": 38.1, "n": 134}, {"tema": "Organiza tu Semana Académica", "audiencia": "Estudiantes", "pct": 37.4, "n": 318}, {"tema": "Transforma la Frustración en Avance", "audiencia": "Estudiantes", "pct": 37.0, "n": 108}, {"tema": "Activa tu Motivación", "audiencia": "Estudiantes", "pct": 36.1, "n": 244}, {"tema": "Conoce la Inscripción PAES", "audiencia": "Estudiantes", "pct": 34.0, "n": 432}, {"tema": "PAES Invierno: Prioriza y Avanza en el Tramo Final", "audiencia": "Estudiantes", "pct": 33.3, "n": 138}, {"tema": "Define tus Metas", "audiencia": "Estudiantes", "pct": 32.8, "n": 354}, {"tema": "Activa tu Lectura Estratégica", "audiencia": "Estudiantes", "pct": 29.7, "n": 158}, {"tema": "Programa de Orientación Logra tu Máximo", "audiencia": "Estudiantes", "pct": 28.6, "n": 192}, {"tema": "ACÉRCATE A LA EXPERIENCIA PREU PDV", "audiencia": "Apoderados", "pct": 26.9, "n": 594}, {"tema": "Cómo acompañar hacia la Educación Superior", "audiencia": "Apoderados", "pct": 24.5, "n": 49}, {"tema": "Cómo Funciona la Admisión Universitaria", "audiencia": "Apoderados", "pct": 22.7, "n": 445}];
+const MONTH_COLORS = {"Postulaciones": "#FFF3CF", "Enero": "#F7E4B2", "Febrero": "#EFD696", "Marzo": "#E7C87A", "Abril": "#E0BA5E", "Mayo": "#D8AC42", "Junio": "#D09E26", "Julio": "#C9900A"};
+const MONTH_ORDER = ["Postulaciones","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+let sortState = { col: 'mes', asc: true };
+
+function renderDetalle() {
+  const rows = [...DETALLE].sort((a,b) => {
+    let va = a[sortState.col], vb = b[sortState.col];
+    if (sortState.col === 'mes') { va = MONTH_ORDER.indexOf(va); vb = MONTH_ORDER.indexOf(vb); }
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+    if (va < vb) return sortState.asc ? -1 : 1;
+    if (va > vb) return sortState.asc ? 1 : -1;
+    return 0;
+  });
+  document.getElementById('tbody_detalle').innerHTML = rows.map(r =>
+    `<tr><td><span class="mes-chip" style="background:${MONTH_COLORS[r.mes]||'#ccc'}"></span>${r.mes}</td><td>${r.tema}</td><td>${r.audiencia||''}</td><td>${r.cantidad}</td><td>${r.inscritos.toLocaleString('es-CL')}</td><td>${r.asistentes.toLocaleString('es-CL')}</td><td>${r.pct}%</td></tr>`
+  ).join('');
+}
+function sortBy(col) {
+  if (sortState.col === col) sortState.asc = !sortState.asc;
+  else { sortState.col = col; sortState.asc = true; }
+  renderDetalle();
+}
+
+function renderMesLegend() {
+  const meses = PIVOT.meses;
+  document.getElementById('mesLegend').innerHTML = meses.map(m =>
+    `<span><span class="legend-chip" style="background:${MONTH_COLORS[m]}"></span>${m}</span>`
+  ).join('');
+}
+
+function renderEvolucion() {
+  new Chart(document.getElementById('chartEvolucion'), {
+    type:'bar',
+    data:{
+      labels: EVOLUCION.map(e=>e.mes),
+      datasets:[{ data: EVOLUCION.map(e=>e.pct), backgroundColor: EVOLUCION.map(e=>MONTH_COLORS[e.mes]), borderRadius:4, maxBarThickness:50 }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{callbacks:{label:(c)=>' '+c.formattedValue+'%'}},
+        datalabels:false
+      },
+      scales:{
+        x:{grid:{display:false}, ticks:{color:'#726C5C', font:{size:11}}},
+        y:{grid:{color:'#EAE3D2'}, ticks:{color:'#726C5C', font:{size:11}, callback:(v)=>v+'%'}, max:100}
+      }
+    },
+    plugins:[{
+      id:'valueLabels',
+      afterDatasetsDraw(chart) {
+        const {ctx} = chart;
+        chart.data.datasets[0].data.forEach((val, i) => {
+          const meta = chart.getDatasetMeta(0);
+          const bar = meta.data[i];
+          ctx.save();
+          ctx.fillStyle = '#141414';
+          ctx.font = 'bold 12px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(val + '%', bar.x, bar.y - 6);
+          ctx.restore();
+        });
+      }
+    }]
+  });
+}
+
+function renderRanking() {
+  const labels = RANKING.map(r => r.tema + ' — ' + r.audiencia);
+  const data = RANKING.map(r => r.pct);
+  const colors = RANKING.map(r => r.n < 20 ? '#D8CFAE' : '#1F4E4A');
+  document.getElementById('rankingWrap').style.height = Math.max(320, RANKING.length*26) + 'px';
+  new Chart(document.getElementById('chartRanking'), {
+    type:'bar',
+    data:{ labels, datasets:[{ data, backgroundColor: colors, borderRadius:3, maxBarThickness:18 }] },
+    options:{
+      responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      layout:{ padding:{ right: 90 } },
+      plugins:{ legend:{display:false},
+        tooltip:{callbacks:{label:(c)=>{ const r=RANKING[c.dataIndex]; return ' '+r.pct+'% (n='+r.n+')'; }}}
+      },
+      scales:{
+        x:{grid:{color:'#EAE3D2'}, ticks:{color:'#726C5C', font:{size:11}, callback:(v)=>v+'%'}, max:100, suggestedMax:100 },
+        y:{grid:{display:false}, ticks:{color:'#4a4a46', font:{size:11}}}
+      }
+    },
+    plugins:[{
+      id:'rankingLabels',
+      afterDatasetsDraw(chart) {
+        const {ctx} = chart;
+        const meta = chart.getDatasetMeta(0);
+        RANKING.forEach((r, i) => {
+          const bar = meta.data[i];
+          ctx.save();
+          ctx.fillStyle = '#141414';
+          ctx.font = 'bold 11px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(r.pct + '% (n=' + r.n + ')', bar.x + 6, bar.y);
+          ctx.restore();
+        });
+      }
+    }]
+  });
+}
+
+renderMesLegend();
+renderDetalle();
+renderEvolucion();
+renderRanking();
+</script>
+</body>
+</html>
