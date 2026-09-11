@@ -396,6 +396,7 @@ function evolStackedPct(canvasId, labels, pctPresencial, pctVirtual) {
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 18 } },
       plugins: {
         legend: { position: 'top', labels: { font: { size: 11 }, color: '#726C5C' } },
         tooltip: { callbacks: { label: (c) => ` ${c.dataset.label}: ${c.parsed.y}%` } }
@@ -414,9 +415,15 @@ function evolStackedPct(canvasId, labels, pctPresencial, pctVirtual) {
           ds.data.forEach((value, i) => {
             if (value < 8) return;
             const bar = meta.data[i];
-            ctx.save(); ctx.fillStyle = '#FFF8E7'; ctx.font = 'bold 10px sans-serif';
+            ctx.save();
+            ctx.font = 'bold 11px sans-serif';
             ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(value + '%', bar.x, bar.y); ctx.restore();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'rgba(20,20,20,0.55)';
+            ctx.strokeText(value + '%', bar.x, bar.y);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText(value + '%', bar.x, bar.y);
+            ctx.restore();
           });
         });
       }
@@ -559,59 +566,6 @@ function render() {
 
   let html = '';
 
-  // ---- Evolución mensual (solo en Total 2026) ----
-  if (currentMonth === 'Total') {
-    const sumaEvol = (campo) => meses.reduce((acc, m2) => acc + (evolucionMensual[m2][campo]||0), 0);
-    const totEvolAtenciones = sumaEvol('Atenciones');
-    const totEvolConsultas = sumaEvol('Consultas');
-    const totEvolDerivaciones = sumaEvol('Derivaciones');
-    const totEvolDerivados = sumaEvol('Prematricula_realizadas') + sumaEvol('Prematricula_no_realizadas');
-    const totEvolRealizadas = sumaEvol('Prematricula_realizadas');
-    const totEvolMatriculados = sumaEvol('Matriculados');
-
-    html += `<div class="section">
-      <div class="section-title">Evolución mensual 2026</div>
-      <div class="section-note">Totales por mes, sin diferenciar por sede o profesional.</div>
-
-      <div class="subsection" style="margin-top:0; padding-top:0; border-top:none;">
-        <div class="subsection-title">Atenciones</div>
-        <div class="kpi-row">${kpi('Total 2026', totEvolAtenciones.toLocaleString('es-CL'))}</div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_atenciones"></canvas></div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-title">Consultas / mensajería</div>
-        <div class="kpi-row">${kpi('Total 2026', totEvolConsultas.toLocaleString('es-CL'))}</div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_consultas"></canvas></div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-title">Prematrícula: Derivados, Realizadas y Matriculados</div>
-        <div class="kpi-row">${kpi('Derivados', totEvolDerivados.toLocaleString('es-CL')) + kpi('Realizadas', totEvolRealizadas.toLocaleString('es-CL')) + kpi('Matriculados', totEvolMatriculados.toLocaleString('es-CL'))}</div>
-        <div class="chart-wrap" style="height:260px;"><canvas id="c_evol_prematricula"></canvas></div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-title">Derivaciones</div>
-        <div class="kpi-row">${kpi('Total 2026', totEvolDerivaciones.toLocaleString('es-CL'))}</div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_derivaciones"></canvas></div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-title">Modalidad: ¿pesa tener presencia física en la sede?</div>
-        <div class="section-note">Comparación de atenciones promedio por sede, agrupando según si la sede tuvo al menos una atención Presencial en el período (Febrero-Julio, único rango con este dato) o si operó 100% Virtual todo el período. La clasificación se calcula desde los datos reales, no desde una lista fija — por eso una sede como Chillán (que partió presencial y hoy opera virtual por licencia de la profesional) cuenta según lo que realmente ocurrió. No implica causalidad: podría ser que ya elegimos poner presencial donde sabíamos que había más demanda.</div>
-        <div class="kpi-row" id="kpi_modalidad_peso"></div>
-        <div class="chart-wrap" style="height:180px;"><canvas id="c_evol_modalidad_peso"></canvas></div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-title">Modalidad: evolución del % Presencial vs Virtual</div>
-        <div class="section-note">Solo Febrero-Julio (Postulaciones y Enero no tienen este dato en su fuente).</div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_modalidad_pct"></canvas></div>
-      </div>
-    </div>`;
-  }
-
   // ---- Atenciones ----
   const atencionesNote = (isSede && (currentMonth === 'Postulaciones' || currentMonth === 'Enero' || currentMonth === 'Total'))
     ? 'El formulario que permite identificar Atenciones por sede se implementó a partir de Febrero 2026. Postulaciones y Enero solo tienen registro por profesional (esa vista sí las incluye completas).'
@@ -710,6 +664,59 @@ function render() {
       : emptySection('Derivaciones por sede');
   } else {
     html += `<div class="section"><div class="section-title">Derivaciones por profesional</div><div class="section-note">Esta fuente no registra profesional a propósito (el dato original es el docente que deriva, no el equipo de orientación).</div></div>`;
+  }
+
+  // ---- Evolución mensual (solo en Total 2026, al final, después del mismo orden que los meses) ----
+  if (currentMonth === 'Total') {
+    const sumaEvol = (campo) => meses.reduce((acc, m2) => acc + (evolucionMensual[m2][campo]||0), 0);
+    const totEvolAtenciones = sumaEvol('Atenciones');
+    const totEvolConsultas = sumaEvol('Consultas');
+    const totEvolDerivaciones = sumaEvol('Derivaciones');
+    const totEvolDerivados = sumaEvol('Prematricula_realizadas') + sumaEvol('Prematricula_no_realizadas');
+    const totEvolRealizadas = sumaEvol('Prematricula_realizadas');
+    const totEvolMatriculados = sumaEvol('Matriculados');
+
+    html += `<div class="section">
+      <div class="section-title">Evolución mensual 2026</div>
+      <div class="section-note">Totales por mes, sin diferenciar por sede o profesional.</div>
+
+      <div class="subsection" style="margin-top:0; padding-top:0; border-top:none;">
+        <div class="subsection-title">Atenciones</div>
+        <div class="kpi-row">${kpi('Total 2026', totEvolAtenciones.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_atenciones"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Consultas / mensajería</div>
+        <div class="kpi-row">${kpi('Total 2026', totEvolConsultas.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_consultas"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Prematrícula: Derivados, Realizadas y Matriculados</div>
+        <div class="kpi-row">${kpi('Derivados', totEvolDerivados.toLocaleString('es-CL')) + kpi('Realizadas', totEvolRealizadas.toLocaleString('es-CL')) + kpi('Matriculados', totEvolMatriculados.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:260px;"><canvas id="c_evol_prematricula"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Derivaciones</div>
+        <div class="kpi-row">${kpi('Total 2026', totEvolDerivaciones.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_derivaciones"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Modalidad: ¿pesa tener presencia física en la sede?</div>
+        <div class="section-note">Comparación de atenciones promedio por sede, agrupando según si la sede tuvo al menos una atención Presencial en el período (Febrero-Agosto, único rango con este dato) o si operó 100% Virtual todo el período. La clasificación se calcula desde los datos reales, no desde una lista fija — por eso una sede como Chillán (que partió presencial y hoy opera virtual por licencia de la profesional) cuenta según lo que realmente ocurrió. No implica causalidad: podría ser que ya elegimos poner presencial donde sabíamos que había más demanda.</div>
+        <div class="kpi-row" id="kpi_modalidad_peso"></div>
+        <div class="chart-wrap" style="height:180px;"><canvas id="c_evol_modalidad_peso"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Modalidad: evolución del % Presencial vs Virtual</div>
+        <div class="section-note">Solo Febrero-Agosto (Postulaciones y Enero no tienen este dato en su fuente).</div>
+        <div class="chart-wrap" style="height:260px;"><canvas id="c_evol_modalidad_pct"></canvas></div>
+      </div>
+    </div>`;
   }
 
   document.getElementById('content').innerHTML = html;
