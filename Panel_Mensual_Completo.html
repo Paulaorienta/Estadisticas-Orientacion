@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Evolución de Atenciones 2026 — Programa de Orientación PDV</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAF8F2; color: #141414; padding: 32px 24px; }
+  .page { max-width: 1180px; margin: 0 auto; }
+  .header { background: #F2B705; color: #141414; padding: 20px 28px; border-radius: 12px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .header-title { font-size: 18px; font-weight: 800; }
+  .header-sub { font-size: 14px; font-weight: 600; opacity: .88; margin-top: 4px; }
+  .header-period { font-size: 14px; background: #C9900A; color: #141414; padding: 7px 18px; border-radius: 6px; font-weight: 800; letter-spacing: .2px; white-space: nowrap; }
+
+  .month-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .month-btn { padding: 9px 16px; background: #FFF3CF; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; color: #4a4a46; cursor: pointer; }
+  .month-btn.active { background: #F2B705; color: #141414; }
+  .month-btn.total-btn { background: #EAE3D2; }
+  .month-btn.total-btn.active { background: #3C4A45; color: #FFF8E7; }
+
+  .view-tabs { display: flex; gap: 8px; margin-bottom: 22px; }
+  .view-btn { flex: 1; padding: 10px; text-align: center; background: #EAE3D2; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 700; color: #4a4a46; cursor: pointer; }
+  .view-btn.active { background: #3C4A45; color: #FFF8E7; }
+
+  .kpi-row { display: flex; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+  .kpi { background: #FFFFFF; border: 1px solid #EAE3D2; border-left: 4px solid #F2B705; border-radius: 10px; padding: 14px 22px; min-width: 150px; flex: 1; }
+  .kpi-label { font-size: 11.5px; color: #726C5C; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+  .kpi-value { font-size: 26px; font-weight: 800; }
+
+  .section { background: #fff; border: 1px solid #EAE3D2; border-radius: 14px; padding: 22px 26px 26px; margin-bottom: 22px; }
+  .section-title { font-size: 15px; font-weight: 700; color: #141414; margin-bottom: 4px; }
+  .section-note { font-size: 12px; color: #726C5C; margin-bottom: 14px; font-style: italic; }
+  .chart-wrap { position: relative; width: 100%; }
+  .empty { font-size: 13px; color: #726C5C; padding: 20px 0; text-align: center; }
+  .subsection { margin-top: 26px; padding-top: 22px; border-top: 1px solid #EAE3D2; }
+  .subsection-title { font-size: 13.5px; font-weight: 700; color: #141414; margin-bottom: 4px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  th { text-align: center; padding: 9px 8px; background: #FFF3CF; color: #4a4a46; font-weight: 700; cursor: pointer; user-select: none; }
+  th:first-child, th:nth-child(2) { text-align: left; }
+  td { text-align: center; padding: 8px; border-bottom: 1px solid #EAE3D2; }
+  td:first-child, td:nth-child(2) { text-align: left; }
+  tr:hover td { background: #FFF9E6; }
+
+  .footer { margin-top: 8px; text-align: center; font-size: 11.5px; color: #a39d8a; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <div class="header-title">Evolución de Atenciones 2026</div>
+      <div class="header-sub">Programa de Orientación — Preuniversitario Pedro de Valdivia</div>
+    </div>
+    <div class="header-period" id="month-pill">Agosto 2026</div>
+  </div>
+
+  <div class="month-tabs" id="month-tabs"></div>
+  <div class="view-tabs">
+    <button class="view-btn active" id="btn-sede" onclick="setView('por_sede')">Por sede</button>
+    <button class="view-btn" id="btn-prof" onclick="setView('por_profesional')">Por profesional</button>
+  </div>
+
+  <div id="content"></div>
+
+  <div class="footer">Datos del Consolidado del equipo de orientación · Para reflejar cambios, pide una actualización en esta misma conversación</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const data = {"Postulaciones": {"por_sede": {"Consultas": {"Brasil": 1, "Providencia": 11, "La Serena": 2, "Antofagasta": 2, "Chillán": 1, "Concepción": 8, "Los Ángeles": 6, "Maipú": 1, "Puerto Montt": 1, "Quilpué": 2, "Rancagua": 5, "San Bernardo": 1, "San Pedro de la Paz": 4, "Temuco": 6, "Valdivia": 4, "Recoleta": 1, "Puente Alto": 6, "Plaza Egaña": 5, "PDV Online": 2, "Curicó": 4, "Chicureo": 5, "Arica": 3, "Iquique": 5, "Sede Virtual": 8, "San Miguel": 3}}, "por_profesional": {"Consultas": {"Paula Noya": 12, "Oscar Cayul": 5, "Daniela Aros": 2, "Daniel Araya": 6, "Ivonne Peñailillo": 3, "Yessenia Berríos": 12, "Yisví Paz": 10, "Teresa Monardes": 3, "Angélica Álvarez": 19, "Scottie Burdiles": 1, "Cynthia Gatica": 10, "Santiago Valenzuela": 10, "Javiera Carvajal": 4}, "Atenciones": {"Angélica Álvarez": 34, "Daniel Araya": 32, "Daniela Aros": 43, "Yessenia Berríos": 18, "Scottie Burdiles": 38, "Javiera Carvajal": 7, "Oscar Cayul": 14, "Cynthia Gatica": 46, "Teresa Monardes": 43, "Paula Noya": 33, "Yisví Paz": 15, "Ivonne Peñailillo": 54, "Carolina Rojas": 17, "Santiago Valenzuela": 41}}, "detalle_atenciones": {"Realizada": 435, "No realizada": 0}, "tema_total": {"Gratuidad, Becas y Créditos": 13, "Postulaciones Universidades": 53, "Orientación Vocacional": 13, "Otras consultas al asesor vocacional": 11, "Ponderaciones y Puntajes Carreras": 5, "Aranceles Universidades": 1, "Bienestar Emocional": 1}, "modalidad_atenciones_sede": {}, "modalidad_atenciones_prof": {}, "modalidad_prematricula_sede": {}, "modalidad_prematricula_prof": {}, "tema_plataforma": {"Postulaciones Universidades": {"Web": 45, "App": 12}, "Orientación Vocacional": {"Web": 17, "App": 14}, "Estrategias de Estudio": {"App": 5}, "Gratuidad, Becas y Créditos": {"App": 10, "Web": 9}, "Bienestar Emocional": {"Web": 2, "App": 1}, "Aranceles Universidades": {"App": 2}, "Ponderaciones y Puntajes Carreras": {"App": 6, "Web": 2}, "Otras consultas al asesor vocacional": {"App": 10, "Web": 3}}}, "Enero": {"por_sede": {"Consultas": {"Concepción": 3, "Rancagua": 4, "Quilpué": 1, "Melipilla": 1, "Los Ángeles": 4, "Maipú": 1, "Sede Virtual": 1, "Osorno": 1, "San Bernardo": 1, "Chillán": 3, "Curicó": 6, "Apoquindo": 1, "La Serena": 1, "Agustinas": 3, "Calama": 1, "Arica": 1, "San Pedro de la Paz": 1, "Puente Alto": 1, "Brasil": 1, "Plaza Egaña": 2, "Temuco": 1, "Quillota": 1}, "Prematricula_realizadas": {"Antofagasta": 1, "Apoquindo": 3, "Chillán": 1, "Iquique": 6, "Los Ángeles": 4, "Osorno": 3, "Plaza Egaña": 2, "Providencia": 1, "Puente Alto": 2, "Puerto Montt": 4, "Rancagua": 3, "Recoleta": 1, "San Bernardo": 8, "San Miguel": 2, "San Pedro de la Paz": 1, "Temuco": 2, "Vitacura": 2}, "Prematricula_no_realizadas": {"La Florida": 1, "San Bernardo": 3, "San Pedro de la Paz": 4, "Valdivia": 1, "Viña del Mar": 2, "Vitacura": 2}, "Matriculados": {"Apoquindo": 2, "Chillán": 1, "Iquique": 4, "Los Ángeles": 2, "Osorno": 3, "Plaza Egaña": 1, "Puente Alto": 2, "Puerto Montt": 3, "Rancagua": 2, "Recoleta": 1, "San Bernardo": 5, "San Miguel": 2, "San Pedro de la Paz": 1, "Temuco": 1, "Vitacura": 1}}, "por_profesional": {"Consultas": {"Angélica Álvarez": 6, "Cynthia Gatica": 4, "Ivonne Peñailillo": 1, "Scottie Burdiles": 5, "Carolina Rojas": 1, "Teresa Monardes": 3, "Yisví Paz": 4, "Yessenia Berríos": 5, "Daniel Araya": 1, "Daniela Aros": 1, "Oscar Cayul": 4, "Paula Noya": 2, "Tatiana Elgueta": 2, "Javiera Carvajal": 1}, "Atenciones": {"Angélica Álvarez": 7, "Daniel Araya": 7, "Daniela Aros": 6, "Yessenia Berríos": 4, "Scottie Burdiles": 8, "Oscar Cayul": 5, "Cynthia Gatica": 10, "Teresa Monardes": 18, "Paula Noya": 4, "Yisví Paz": 6, "Ivonne Peñailillo": 6, "Carolina Rojas": 3, "Santiago Valenzuela": 10}}, "detalle_atenciones": {"Realizada": 89, "No realizada": 5}, "tema_total": {"Postulaciones Universidades": 4, "Orientación Vocacional": 18, "Estrategias de Estudio": 5, "Gratuidad, Becas y Créditos": 6, "Bienestar Emocional": 2, "Aranceles Universidades": 1, "Ponderaciones y Puntajes Carreras": 3, "Otras consultas al asesor vocacional": 1}, "modalidad_atenciones_sede": {}, "modalidad_atenciones_prof": {}, "modalidad_prematricula_sede": {}, "modalidad_prematricula_prof": {}, "tema_plataforma": {"Postulaciones Universidades": {"Web": 45, "App": 12}, "Orientación Vocacional": {"Web": 17, "App": 14}, "Estrategias de Estudio": {"App": 5}, "Gratuidad, Becas y Créditos": {"App": 10, "Web": 9}, "Bienestar Emocional": {"Web": 2, "App": 1}, "Aranceles Universidades": {"App": 2}, "Ponderaciones y Puntajes Carreras": {"App": 6, "Web": 2}, "Otras consultas al asesor vocacional": {"App": 10, "Web": 3}}}, "Febrero": {"por_sede": {"Consultas": {"Agustinas": 2, "La Florida": 4, "Brasil": 3, "Providencia": 3, "Calama": 2, "Chillán": 3, "Concepción": 6, "Maipú": 4, "Melipilla": 1, "Osorno": 2, "Puerto Montt": 7, "Quillota": 2, "Rancagua": 1, "San Bernardo": 2, "San Pedro de la Paz": 3, "Talca": 1, "Recoleta": 2, "Puente Alto": 3, "Plaza Egaña": 1, "Curicó": 4, "Arica": 1, "Iquique": 4, "Sede Virtual": 8, "San Miguel": 5, "Peñalolén": 1}, "Atenciones": {"Chillán": 11, "Brasil": 6, "Curicó": 3, "Providencia": 11, "San Miguel": 3, "Concepción": 2, "Osorno": 5, "Puente Alto": 2, "Chicureo": 1, "Recoleta": 1, "Viña del Mar": 1, "Temuco": 4, "Maipú": 8, "La Florida": 2, "Apoquindo": 3, "La Serena": 1, "San Bernardo": 1, "Valdivia": 1, "Agustinas": 1, "Vitacura": 1}, "Prematricula_realizadas": {"Agustinas": 3, "Temuco": 2, "Quillota": 2, "San Bernardo": 1, "Chillán": 4, "Apoquindo": 3, "Iquique": 7, "San Miguel": 1, "Providencia": 11, "Puerto Montt": 4, "Vitacura": 1, "La Florida": 3, "Viña del Mar": 2, "Reñaca": 1, "Rancagua": 3, "San Pedro de la Paz": 1, "Plaza Egaña": 1, "Calama": 2, "Chicureo": 1}, "Prematricula_no_realizadas": {"San Bernardo": 1, "Chillán": 1, "Providencia": 1, "Calama": 1, "Quillota": 1, "Vitacura": 1, "Viña del Mar": 1, "Melipilla": 1}, "Matriculados": {"Agustinas": 3, "Temuco": 2, "Quillota": 1, "San Bernardo": 1, "Chillán": 3, "San Miguel": 1, "Providencia": 9, "Iquique": 5, "Puerto Montt": 3, "La Florida": 2, "Reñaca": 1, "Rancagua": 2, "Apoquindo": 2, "San Pedro de la Paz": 1, "Plaza Egaña": 1, "Calama": 2, "Chicureo": 1}, "No_matriculados": {"Apoquindo": 1, "Iquique": 2, "Providencia": 2, "Vitacura": 1, "Viña del Mar": 2, "Quillota": 1, "Puerto Montt": 1, "Rancagua": 1, "Chillán": 1, "La Florida": 1}}, "por_profesional": {"Consultas": {"Oscar Cayul": 7, "Daniela Aros": 1, "Carolina Rojas": 5, "Paula Noya": 9, "Yisví Paz": 12, "Ivonne Peñailillo": 2, "Scottie Burdiles": 11, "Daniel Araya": 9, "Tatiana Elgueta": 3, "Yessenia Berríos": 11, "Angélica Álvarez": 2, "Santiago Valenzuela": 2, "Javiera Carvajal": 1}, "Atenciones": {"Scottie Burdiles": 14, "Paula Noya": 6, "Yessenia Berríos": 6, "Yisví Paz": 16, "Oscar Cayul": 3, "Carolina Rojas": 8, "Santiago Valenzuela": 1, "Daniel Araya": 6, "Ivonne Peñailillo": 1, "Tatiana Elgueta": 3, "Daniela Aros": 2, "Angélica Álvarez": 2}, "Prematricula_realizadas": {"Oscar Cayul": 10, "Yessenia Berríos": 3, "Scottie Burdiles": 7, "Santiago Valenzuela": 1, "Paula Noya": 7, "Yisví Paz": 5, "Carolina Rojas": 2, "Daniel Araya": 3, "Tatiana Elgueta": 3, "Angélica Álvarez": 4, "Javiera Carvajal": 1, "Ivonne Peñailillo": 5, "Daniela Aros": 2}, "Prematricula_no_realizadas": {"Oscar Cayul": 3, "Scottie Burdiles": 1, "Yisví Paz": 1, "Daniel Araya": 2, "Javiera Carvajal": 1}, "Matriculados": {"Oscar Cayul": 8, "Yessenia Berríos": 3, "Scottie Burdiles": 5, "Yisví Paz": 4, "Paula Noya": 5, "Carolina Rojas": 2, "Daniel Araya": 3, "Tatiana Elgueta": 2, "Ivonne Peñailillo": 4, "Angélica Álvarez": 3, "Daniela Aros": 1}, "No_matriculados": {"Santiago Valenzuela": 1, "Paula Noya": 2, "Yisví Paz": 1, "Scottie Burdiles": 2, "Oscar Cayul": 2, "Angélica Álvarez": 1, "Javiera Carvajal": 1, "Ivonne Peñailillo": 1, "Tatiana Elgueta": 1, "Daniela Aros": 1}}, "detalle_atenciones": {"Realizada": 65, "No realizada": 3}, "tema_total": {"Otras consultas al asesor vocacional": 19, "Orientación Vocacional": 22, "Gratuidad, Becas y Créditos": 8, "Aranceles Universidades": 2, "Estrategias de Estudio": 17, "Ponderaciones y Puntajes Carreras": 3, "Bienestar Emocional": 3, "Postulaciones Universidades": 1}, "modalidad_atenciones_sede": {"Chillán": {"Presencial": 11}, "Brasil": {"Presencial": 6}, "Curicó": {"Virtual": 3}, "Providencia": {"Presencial": 9, "Virtual": 2}, "San Miguel": {"Presencial": 2, "Virtual": 1}, "Concepción": {"Virtual": 2}, "Osorno": {"Virtual": 5}, "Puente Alto": {"Virtual": 2}, "Chicureo": {"Virtual": 1}, "Recoleta": {"Presencial": 1}, "Viña del Mar": {"Virtual": 1}, "Temuco": {"Presencial": 4}, "Maipú": {"Virtual": 4, "Presencial": 4}, "La Florida": {"Virtual": 1, "Presencial": 1}, "Apoquindo": {"Presencial": 1, "Virtual": 2}, "La Serena": {"Virtual": 1}, "San Bernardo": {"Virtual": 1}, "Valdivia": {"Virtual": 1}, "Agustinas": {"Presencial": 1}, "Vitacura": {"Virtual": 1}}, "modalidad_atenciones_prof": {"Scottie Burdiles": {"Presencial": 11, "Virtual": 3}, "Paula Noya": {"Presencial": 6}, "Yessenia Berríos": {"Virtual": 4, "Presencial": 2}, "Yisví Paz": {"Presencial": 9, "Virtual": 7}, "Oscar Cayul": {"Virtual": 1, "Presencial": 2}, "Carolina Rojas": {"Virtual": 6, "Presencial": 2}, "Santiago Valenzuela": {"Presencial": 1}, "Daniel Araya": {"Virtual": 5, "Presencial": 1}, "Ivonne Peñailillo": {"Presencial": 1}, "Tatiana Elgueta": {"Virtual": 1, "Presencial": 2}, "Daniela Aros": {"Virtual": 1, "Presencial": 1}, "Angélica Álvarez": {"Presencial": 2}}, "modalidad_prematricula_sede": {"Agustinas": {"Presencial": 3}, "Temuco": {"Presencial": 2}, "Quillota": {"Virtual": 3}, "San Bernardo": {"Virtual": 2}, "Chillán": {"Presencial": 4, "Virtual": 1}, "Apoquindo": {"Virtual": 1, "Presencial": 2}, "Iquique": {"Virtual": 7}, "San Miguel": {"Presencial": 1}, "Providencia": {"Presencial": 10, "Virtual": 2}, "Puerto Montt": {"Virtual": 4}, "Vitacura": {"Virtual": 2}, "La Florida": {"Virtual": 2, "Presencial": 1}, "Viña del Mar": {"Virtual": 3}, "Reñaca": {"Virtual": 1}, "Rancagua": {"Virtual": 3}, "San Pedro de la Paz": {"Virtual": 1}, "Plaza Egaña": {"Presencial": 1}, "Calama": {"Virtual": 3}, "Chicureo": {"Virtual": 1}, "Melipilla": {"Virtual": 1}}, "modalidad_prematricula_prof": {"Oscar Cayul": {"Presencial": 4, "Virtual": 9}, "Yessenia Berríos": {"Presencial": 1, "Virtual": 2}, "Scottie Burdiles": {"Virtual": 4, "Presencial": 4}, "Santiago Valenzuela": {"Virtual": 1}, "Paula Noya": {"Virtual": 7}, "Yisví Paz": {"Presencial": 5, "Virtual": 1}, "Carolina Rojas": {"Virtual": 2}, "Daniel Araya": {"Presencial": 2, "Virtual": 3}, "Tatiana Elgueta": {"Presencial": 1, "Virtual": 2}, "Angélica Álvarez": {"Virtual": 3, "Presencial": 1}, "Javiera Carvajal": {"Virtual": 2}, "Ivonne Peñailillo": {"Presencial": 5}, "Daniela Aros": {"Virtual": 1, "Presencial": 1}}, "tema_plataforma": {"Otras consultas al asesor vocacional": {"App": 14, "Web": 5}, "Orientación Vocacional": {"App": 15, "Web": 7}, "Gratuidad, Becas y Créditos": {"Web": 2, "App": 6}, "Aranceles Universidades": {"App": 2}, "Estrategias de Estudio": {"Web": 4, "App": 13}, "Ponderaciones y Puntajes Carreras": {"App": 3}, "Bienestar Emocional": {"Web": 1, "App": 2}, "Postulaciones Universidades": {"App": 1}}}, "Marzo": {"por_sede": {"Consultas": {"Agustinas": 14, "Apoquindo": 11, "La Florida": 13, "Brasil": 7, "Providencia": 8, "La Serena": 3, "Antofagasta": 2, "Calama": 12, "Chillán": 23, "Concepción": 23, "Los Ángeles": 8, "Maipú": 15, "Melipilla": 5, "Osorno": 3, "Puerto Montt": 8, "Quillota": 5, "Quilpué": 1, "Rancagua": 27, "San Bernardo": 4, "San Pedro de la Paz": 5, "Talca": 7, "Temuco": 4, "Valdivia": 3, "Viña del Mar": 12, "San Carlos de Apoquindo": 1, "Recoleta": 3, "Vitacura": 1, "Puente Alto": 13, "Plaza Egaña": 23, "PDV Online": 1, "Curicó": 13, "Reñaca": 1, "Chicureo": 2, "Arica": 1, "Iquique": 8, "Valparaíso": 2, "Demo": 1, "Sede Virtual": 62, "San Miguel": 12, "Peñalolén": 2}, "Atenciones": {"Providencia": 21, "Apoquindo": 17, "Temuco": 25, "Plaza Egaña": 11, "Puente Alto": 6, "La Florida": 10, "Puerto Montt": 5, "Sede Virtual - Online": 17, "Los Ángeles": 2, "Quillota": 4, "La Serena": 1, "Iquique": 10, "Maipú": 15, "Agustinas": 8, "Vitacura": 3, "Chillán": 22, "Valdivia": 3, "San Miguel": 20, "Curicó": 7, "Brasil": 3, "San Carlos de Apoquindo": 3, "Calama": 2, "Arica": 4, "Melipilla": 2, "Valparaíso": 4, "San Pedro de la Paz": 1, "Concepción": 9, "Osorno": 4, "San Bernardo": 5, "Quilpué": 1, "Peñalolén": 3, "Recoleta": 2, "Talca": 1, "Rancagua": 1, "Chicureo": 3}, "Prematricula_realizadas": {"Providencia": 8, "Brasil": 2, "Temuco": 6, "Recoleta": 3, "Rancagua": 2, "Puente Alto": 6, "Agustinas": 6, "Vitacura": 2, "Los Ángeles": 2, "Iquique": 4, "Concepción": 3, "San Bernardo": 4, "Quilpué": 1, "Chicureo": 2, "Apoquindo": 1, "Maipú": 4, "Arica": 3, "San Miguel": 6, "Chillán": 2, "Plaza Egaña": 1, "Osorno": 1, "Sede Virtual - Online": 1, "San Pedro de la Paz": 1, "Puerto Montt": 1}, "Prematricula_no_realizadas": {"Vitacura": 1, "Arica": 1, "Maipú": 1, "Providencia": 1, "Temuco": 1}, "Matriculados": {"Providencia": 6, "Recoleta": 3, "Rancagua": 2, "Puente Alto": 5, "Temuco": 2, "Agustinas": 6, "Brasil": 1, "Iquique": 4, "Concepción": 3, "San Bernardo": 3, "Quilpué": 1, "Chicureo": 2, "Apoquindo": 1, "Maipú": 3, "San Miguel": 4, "Vitacura": 1, "Chillán": 2, "Plaza Egaña": 1, "Arica": 1, "Sede Virtual - Online": 1, "San Pedro de la Paz": 1, "Puerto Montt": 1}, "No_matriculados": {"Brasil": 1, "Temuco": 4, "Providencia": 2, "Vitacura": 1, "Los Ángeles": 2, "Puente Alto": 1, "Maipú": 1, "Arica": 2, "San Bernardo": 1, "Osorno": 1, "San Miguel": 2}}, "por_profesional": {"Consultas": {"Oscar Cayul": 12, "Paula Noya": 24, "Daniel Araya": 25, "Daniela Aros": 16, "Ivonne Peñailillo": 9, "Yessenia Berríos": 7, "Teresa Monardes": 85, "Scottie Burdiles": 19, "Carolina Rojas": 25, "Tatiana Elgueta": 25, "Angélica Álvarez": 35, "Santiago Valenzuela": 9, "Yisví Paz": 29, "Javiera Carvajal": 32, "Cynthia Gatica": 17}, "Atenciones": {"Ivonne Peñailillo": 23, "Daniel Araya": 35, "Teresa Monardes": 28, "Oscar Cayul": 10, "Tatiana Elgueta": 11, "Daniela Aros": 11, "Angélica Álvarez": 33, "Javiera Carvajal": 5, "Paula Noya": 18, "Santiago Valenzuela": 12, "Scottie Burdiles": 18, "Cynthia Gatica": 10, "Carolina Rojas": 21, "Yisví Paz": 17, "Yessenia Berríos": 3}, "Prematricula_realizadas": {"Ivonne Peñailillo": 7, "Oscar Cayul": 7, "Angélica Álvarez": 9, "Javiera Carvajal": 3, "Cynthia Gatica": 9, "Tatiana Elgueta": 3, "Daniel Araya": 6, "Paula Noya": 9, "Daniela Aros": 1, "Carolina Rojas": 6, "Yisví Paz": 7, "Scottie Burdiles": 1, "Santiago Valenzuela": 3, "Yessenia Berríos": 1}, "Prematricula_no_realizadas": {"Daniel Araya": 1, "Paula Noya": 1, "Carolina Rojas": 1, "Ivonne Peñailillo": 1, "Yessenia Berríos": 1}, "Matriculados": {"Ivonne Peñailillo": 6, "Oscar Cayul": 6, "Javiera Carvajal": 3, "Cynthia Gatica": 8, "Angélica Álvarez": 4, "Paula Noya": 7, "Daniel Araya": 5, "Tatiana Elgueta": 2, "Carolina Rojas": 5, "Yisví Paz": 4, "Scottie Burdiles": 1, "Santiago Valenzuela": 3}, "No_matriculados": {"Oscar Cayul": 1, "Angélica Álvarez": 5, "Tatiana Elgueta": 1, "Daniel Araya": 1, "Daniela Aros": 1, "Carolina Rojas": 1, "Paula Noya": 2, "Cynthia Gatica": 1, "Yisví Paz": 3, "Ivonne Peñailillo": 1, "Yessenia Berríos": 1}}, "detalle_atenciones": {"Realizada": 230, "No realizada": 25}, "tema_total": {"Otras consultas al asesor vocacional": 135, "Orientación Vocacional": 115, "Estrategias de Estudio": 48, "Postulaciones Universidades": 17, "Ponderaciones y Puntajes Carreras": 11, "Aranceles Universidades": 7, "Bienestar Emocional": 7, "Gratuidad, Becas y Créditos": 26, "Sin categoría": 3}, "modalidad_atenciones_sede": {"Providencia": {"Presencial": 21}, "Apoquindo": {"Presencial": 13, "Virtual": 4}, "Temuco": {"Virtual": 10, "Presencial": 15}, "Plaza Egaña": {"Presencial": 7, "Virtual": 4}, "Puente Alto": {"Virtual": 1, "Presencial": 5}, "La Florida": {"Presencial": 5, "Virtual": 5}, "Puerto Montt": {"Virtual": 5}, "Sede Virtual - Online": {"Virtual": 17}, "Los Ángeles": {"Virtual": 2}, "Quillota": {"Virtual": 4}, "La Serena": {"Virtual": 1}, "Iquique": {"Virtual": 10}, "Maipú": {"Presencial": 12, "Virtual": 3}, "Agustinas": {"Presencial": 7, "Virtual": 1}, "Vitacura": {"Virtual": 3}, "Chillán": {"Virtual": 8, "Presencial": 14}, "Valdivia": {"Virtual": 3}, "San Miguel": {"Presencial": 11, "Virtual": 9}, "Curicó": {"Virtual": 7}, "Brasil": {"Presencial": 3}, "San Carlos de Apoquindo": {"Presencial": 3}, "Calama": {"Virtual": 2}, "Arica": {"Virtual": 4}, "Melipilla": {"Virtual": 2}, "Valparaíso": {"Virtual": 4}, "San Pedro de la Paz": {"Virtual": 1}, "Concepción": {"Virtual": 9}, "Osorno": {"Virtual": 4}, "San Bernardo": {"Presencial": 4, "Virtual": 1}, "Quilpué": {"Virtual": 1}, "Peñalolén": {"Virtual": 1, "Presencial": 2}, "Recoleta": {"Presencial": 2}, "Talca": {"Virtual": 1}, "Rancagua": {"Virtual": 1}, "Chicureo": {"Virtual": 3}}, "modalidad_atenciones_prof": {"Ivonne Peñailillo": {"Presencial": 21, "Virtual": 2}, "Daniel Araya": {"Presencial": 15, "Virtual": 20}, "Teresa Monardes": {"Virtual": 28}, "Oscar Cayul": {"Presencial": 9, "Virtual": 1}, "Tatiana Elgueta": {"Presencial": 7, "Virtual": 4}, "Daniela Aros": {"Presencial": 5, "Virtual": 6}, "Angélica Álvarez": {"Virtual": 20, "Presencial": 13}, "Javiera Carvajal": {"Virtual": 5}, "Paula Noya": {"Virtual": 15, "Presencial": 3}, "Santiago Valenzuela": {"Presencial": 8, "Virtual": 4}, "Scottie Burdiles": {"Presencial": 14, "Virtual": 4}, "Cynthia Gatica": {"Presencial": 9, "Virtual": 1}, "Carolina Rojas": {"Presencial": 9, "Virtual": 12}, "Yisví Paz": {"Virtual": 8, "Presencial": 9}, "Yessenia Berríos": {"Presencial": 2, "Virtual": 1}}, "modalidad_prematricula_sede": {"Providencia": {"Presencial": 8, "Virtual": 1}, "Brasil": {"Presencial": 2}, "Temuco": {"Virtual": 1, "Presencial": 6}, "Recoleta": {"Presencial": 3}, "Rancagua": {"Virtual": 2}, "Puente Alto": {"Presencial": 5, "Virtual": 1}, "Agustinas": {"Presencial": 6}, "Vitacura": {"Presencial": 3}, "Los Ángeles": {"Virtual": 2}, "Iquique": {"Virtual": 4}, "Concepción": {"Virtual": 3}, "San Bernardo": {"Presencial": 2, "Virtual": 2}, "Quilpué": {"Virtual": 1}, "Chicureo": {"Virtual": 2}, "Apoquindo": {"Presencial": 1}, "Maipú": {"Presencial": 4, "Virtual": 1}, "Arica": {"Virtual": 4}, "San Miguel": {"Presencial": 6}, "Chillán": {"Presencial": 1, "Virtual": 1}, "Plaza Egaña": {"Presencial": 1}, "Osorno": {"Virtual": 1}, "Sede Virtual - Online": {"Virtual": 1}, "San Pedro de la Paz": {"Virtual": 1}, "Puerto Montt": {"Virtual": 1}}, "modalidad_prematricula_prof": {"Ivonne Peñailillo": {"Presencial": 8}, "Oscar Cayul": {"Presencial": 7}, "Angélica Álvarez": {"Virtual": 5, "Presencial": 4}, "Javiera Carvajal": {"Virtual": 3}, "Cynthia Gatica": {"Presencial": 7, "Virtual": 2}, "Tatiana Elgueta": {"Virtual": 2, "Presencial": 1}, "Daniel Araya": {"Presencial": 4, "Virtual": 3}, "Paula Noya": {"Presencial": 2, "Virtual": 8}, "Daniela Aros": {"Virtual": 1}, "Carolina Rojas": {"Virtual": 3, "Presencial": 4}, "Yisví Paz": {"Presencial": 6, "Virtual": 1}, "Scottie Burdiles": {"Presencial": 1}, "Santiago Valenzuela": {"Presencial": 2, "Virtual": 1}, "Yessenia Berríos": {"Presencial": 2}}, "tema_plataforma": {"Otras consultas al asesor vocacional": {"Web": 31, "App": 104}, "Orientación Vocacional": {"App": 61, "Web": 54}, "Estrategias de Estudio": {"Web": 25, "App": 23}, "Postulaciones Universidades": {"Web": 8, "App": 9}, "Ponderaciones y Puntajes Carreras": {"App": 10, "Web": 1}, "Aranceles Universidades": {"App": 7}, "Bienestar Emocional": {"App": 5, "Web": 2}, "Gratuidad, Becas y Créditos": {"App": 21, "Web": 5}, "Sin categoría": {"Sin dato": 3}}}, "Abril": {"por_sede": {"Consultas": {"Agustinas": 20, "Apoquindo": 23, "La Florida": 43, "Brasil": 15, "Providencia": 39, "La Serena": 5, "Antofagasta": 4, "Calama": 12, "Chillán": 12, "Concepción": 28, "Los Ángeles": 18, "Maipú": 32, "Melipilla": 12, "Osorno": 24, "Puerto Montt": 11, "Quillota": 11, "Quilpué": 27, "Rancagua": 62, "San Bernardo": 9, "San Pedro de la Paz": 3, "Talca": 24, "Temuco": 44, "Valdivia": 4, "Viña del Mar": 43, "San Carlos de Apoquindo": 4, "Recoleta": 8, "Vitacura": 10, "Puente Alto": 25, "Plaza Egaña": 41, "PDV Online": 32, "Curicó": 20, "Reñaca": 14, "Chicureo": 2, "Arica": 9, "Iquique": 12, "Valparaíso": 10, "CPV- Providencia": 1, "Sede Virtual": 120, "San Miguel": 94, "Peñalolén": 5, "Lampa Express": 1}, "Derivaciones": {"Rancagua": 10, "San Miguel": 2, "Peñalolén": 9, "Arica": 2, "CPV-Peñalolen": 2, "Maipú": 17, "Providencia": 4, "La Florida": 5, "Curicó": 1, "Sede Virtual": 3, "Plaza Egaña": 2, "Puente Alto": 2, "Agustinas": 1, "Quillota": 1, "Apoquindo": 4, "San Bernardo": 1, "Antofagasta": 1, "Recoleta": 1}, "Atenciones": {"Sede Virtual - Online": 40, "Valdivia": 11, "Apoquindo": 47, "Vitacura": 8, "Recoleta": 22, "Temuco": 33, "Brasil": 26, "Concepción": 13, "Los Ángeles": 9, "Puerto Montt": 10, "Valparaíso": 17, "San Bernardo": 20, "La Florida": 30, "La Serena": 4, "Puente Alto": 53, "Arica": 4, "Osorno": 5, "Calama": 7, "Plaza Egaña": 22, "Iquique": 3, "Quilpué": 3, "Providencia": 96, "San Pedro de la Paz": 1, "Melipilla": 4, "Talca": 1, "San Carlos de Apoquindo": 3, "Viña del Mar": 5, "Curicó": 6, "Reñaca": 4, "Agustinas": 43, "Chillán": 8, "Maipú": 37, "Chicureo": 9, "San Miguel": 68, "Rancagua": 17, "Quillota": 1, "Peñalolén": 4, "Antofagasta": 1}, "Prematricula_realizadas": {"La Florida": 1, "Recoleta": 1, "Providencia": 1, "Temuco": 2, "Agustinas": 2, "Chicureo": 2, "Sede Virtual - Online": 1}, "Prematricula_no_realizadas": {"Providencia": 1}, "Matriculados": {"La Florida": 1, "Temuco": 2, "Chicureo": 2, "Sede Virtual - Online": 1, "Agustinas": 1, "Providencia": 1, "Melipilla": 1, "Vitacura": 1, "Arica": 1}, "No_matriculados": {"Recoleta": 1, "Providencia": 1, "Agustinas": 1, "San Bernardo": 1, "Chillán": 1, "Calama": 1, "Quillota": 1, "Vitacura": 1, "Viña del Mar": 1}}, "por_profesional": {"Consultas": {"Paula Noya": 41, "Oscar Cayul": 23, "Daniel Araya": 54, "Daniela Aros": 49, "Ivonne Peñailillo": 45, "Teresa Monardes": 164, "Carolina Rojas": 46, "Scottie Burdiles": 11, "Tatiana Elgueta": 44, "Angélica Álvarez": 76, "Yisví Paz": 195, "Javiera Carvajal": 92, "Cynthia Gatica": 31, "Yessenia Berríos": 41, "Santiago Valenzuela": 21}, "Atenciones": {"Teresa Monardes": 56, "Daniel Araya": 65, "Santiago Valenzuela": 45, "Daniela Aros": 39, "Yessenia Berríos": 15, "Paula Noya": 33, "Angélica Álvarez": 47, "Cynthia Gatica": 73, "Tatiana Elgueta": 22, "Javiera Carvajal": 13, "Ivonne Peñailillo": 100, "Oscar Cayul": 47, "Carolina Rojas": 51, "Yisví Paz": 89}, "Prematricula_realizadas": {"Daniela Aros": 1, "Santiago Valenzuela": 1, "Ivonne Peñailillo": 1, "Yessenia Berríos": 2, "Oscar Cayul": 2, "Carolina Rojas": 2, "Daniel Araya": 1}, "Prematricula_no_realizadas": {"Daniela Aros": 1}, "Matriculados": {"Daniela Aros": 1, "Yessenia Berríos": 2, "Carolina Rojas": 2, "Daniel Araya": 3, "Oscar Cayul": 1, "Yisví Paz": 1, "Paula Noya": 1}, "No_matriculados": {"Santiago Valenzuela": 1, "Ivonne Peñailillo": 1, "Oscar Cayul": 4, "Scottie Burdiles": 1, "Daniel Araya": 1, "Javiera Carvajal": 1}}, "detalle_atenciones": {"Realizada": 607, "No realizada": 88}, "tema_total": {"Otras consultas al asesor vocacional": 274, "Estrategias de Estudio": 158, "Orientación Vocacional": 305, "Gratuidad, Becas y Créditos": 65, "Postulaciones Universidades": 29, "Aranceles Universidades": 10, "Ponderaciones y Puntajes Carreras": 38, "Bienestar Emocional": 49, "Sin categoría": 5}, "modalidad_atenciones_sede": {"Sede Virtual - Online": {"Virtual": 40}, "Valdivia": {"Virtual": 11}, "Apoquindo": {"Presencial": 41, "Virtual": 6}, "Vitacura": {"Virtual": 2, "Presencial": 6}, "Recoleta": {"Presencial": 21, "Virtual": 1}, "Temuco": {"Presencial": 31, "Virtual": 2}, "Brasil": {"Presencial": 25, "Virtual": 1}, "Concepción": {"Virtual": 13}, "Los Ángeles": {"Virtual": 9}, "Puerto Montt": {"Virtual": 10}, "Valparaíso": {"Virtual": 17}, "San Bernardo": {"Presencial": 18, "Virtual": 2}, "La Florida": {"Presencial": 23, "Virtual": 7}, "La Serena": {"Virtual": 4}, "Puente Alto": {"Presencial": 53}, "Arica": {"Virtual": 4}, "Osorno": {"Virtual": 5}, "Calama": {"Virtual": 7}, "Plaza Egaña": {"Presencial": 22}, "Iquique": {"Virtual": 3}, "Quilpué": {"Virtual": 3}, "Providencia": {"Virtual": 5, "Presencial": 91}, "San Pedro de la Paz": {"Virtual": 1}, "Melipilla": {"Virtual": 4}, "Talca": {"Virtual": 1}, "San Carlos de Apoquindo": {"Presencial": 3}, "Viña del Mar": {"Virtual": 5}, "Curicó": {"Virtual": 6}, "Reñaca": {"Virtual": 4}, "Agustinas": {"Presencial": 42, "Virtual": 1}, "Chillán": {"Virtual": 8}, "Maipú": {"Presencial": 33, "Virtual": 4}, "Chicureo": {"Virtual": 9}, "San Miguel": {"Presencial": 66, "Virtual": 2}, "Rancagua": {"Virtual": 17}, "Quillota": {"Virtual": 1}, "Peñalolén": {"Presencial": 3, "Virtual": 1}, "Antofagasta": {"Virtual": 1}}, "modalidad_atenciones_prof": {"Teresa Monardes": {"Virtual": 56}, "Daniel Araya": {"Presencial": 47, "Virtual": 18}, "Santiago Valenzuela": {"Presencial": 24, "Virtual": 21}, "Daniela Aros": {"Virtual": 16, "Presencial": 23}, "Yessenia Berríos": {"Presencial": 12, "Virtual": 3}, "Paula Noya": {"Presencial": 25, "Virtual": 8}, "Angélica Álvarez": {"Virtual": 28, "Presencial": 19}, "Cynthia Gatica": {"Presencial": 71, "Virtual": 2}, "Tatiana Elgueta": {"Presencial": 22}, "Javiera Carvajal": {"Virtual": 13}, "Ivonne Peñailillo": {"Virtual": 6, "Presencial": 94}, "Oscar Cayul": {"Presencial": 42, "Virtual": 5}, "Carolina Rojas": {"Virtual": 18, "Presencial": 33}, "Yisví Paz": {"Presencial": 66, "Virtual": 23}}, "modalidad_prematricula_sede": {"La Florida": {"Presencial": 1}, "Recoleta": {"Presencial": 1}, "Providencia": {"Presencial": 1, "Virtual": 1}, "Temuco": {"Presencial": 2}, "Agustinas": {"Presencial": 2}, "Chicureo": {"Virtual": 2}, "Sede Virtual - Online": {"Virtual": 1}}, "modalidad_prematricula_prof": {"Daniela Aros": {"Presencial": 1, "Virtual": 1}, "Santiago Valenzuela": {"Presencial": 1}, "Ivonne Peñailillo": {"Presencial": 1}, "Yessenia Berríos": {"Presencial": 2}, "Oscar Cayul": {"Presencial": 2}, "Carolina Rojas": {"Virtual": 2}, "Daniel Araya": {"Virtual": 1}}, "tema_plataforma": {"Otras consultas al asesor vocacional": {"App": 173, "Web": 101}, "Estrategias de Estudio": {"Web": 66, "App": 92}, "Orientación Vocacional": {"App": 161, "Web": 144}, "Gratuidad, Becas y Créditos": {"Web": 14, "App": 51}, "Postulaciones Universidades": {"Web": 10, "App": 19}, "Aranceles Universidades": {"App": 9, "Web": 1}, "Ponderaciones y Puntajes Carreras": {"App": 31, "Web": 7}, "Bienestar Emocional": {"Web": 26, "App": 23}, "Sin categoría": {"Sin dato": 5}}}, "Mayo": {"por_sede": {"Consultas": {"Calama": 7, "PDV Online": 31, "Sede Virtual": 58, "Agustinas": 13, "Apoquindo": 9, "La Florida": 28, "Brasil": 5, "Providencia": 19, "La Serena": 13, "Antofagasta": 7, "Chillán": 4, "Concepción": 13, "Los Ángeles": 14, "Maipú": 27, "Melipilla": 14, "Osorno": 13, "Puerto Montt": 8, "Quillota": 27, "Quilpué": 11, "Rancagua": 35, "San Bernardo": 19, "San Pedro de la Paz": 2, "Talca": 21, "Temuco": 19, "Valdivia": 11, "Viña del Mar": 21, "San Carlos de Apoquindo": 3, "Recoleta": 3, "Puente Alto": 30, "Plaza Egaña": 18, "Curicó": 5, "Reñaca": 9, "Chicureo": 1, "Arica": 2, "Iquique": 7, "Valparaíso": 11, "CPV-Peñalolen": 1, "San Miguel": 93, "Peñalolén": 4}, "Derivaciones": {"Chicureo": 2, "Temuco": 7, "Reñaca": 3, "Puente Alto": 1, "Arica": 1, "Recoleta": 2, "Maipú": 8, "Osorno": 2, "San Bernardo": 2, "Valdivia": 1, "Sede Virtual": 2, "Rancagua": 7, "Talca": 3, "La Florida": 4, "Apoquindo": 3, "Viña del Mar": 1, "Agustinas": 1, "San Miguel": 1, "Providencia": 1, "Peñalolén": 1, "Antofagasta": 1, "CPV-Peñalolen": 1, "Melipilla": 1}, "Atenciones": {"Providencia": 65, "Plaza Egaña": 25, "La Florida": 30, "Brasil": 24, "Maipú": 37, "Sede Virtual - Online": 12, "San Miguel": 40, "Rancagua": 13, "Apoquindo": 34, "San Bernardo": 27, "Temuco": 32, "Talca": 11, "Curicó": 6, "Recoleta": 29, "Chillán": 18, "Valparaíso": 9, "Viña del Mar": 4, "Puente Alto": 46, "Puerto Montt": 2, "Reñaca": 2, "Arica": 3, "San Carlos de Apoquindo": 9, "Valdivia": 3, "Quilpué": 4, "Quillota": 4, "Calama": 6, "Peñalolén": 6, "Los Ángeles": 2, "Osorno": 5, "Melipilla": 2, "La Serena": 2, "Vitacura": 2, "Iquique": 1, "Chicureo": 1, "Agustinas": 28, "Concepción": 3, "San Pedro de la Paz": 3}, "Prematricula_realizadas": {"San Bernardo": 2, "Arica": 1, "Sede Virtual - Online": 1, "Brasil": 1, "Providencia": 1, "Agustinas": 1}, "Matriculados": {"San Bernardo": 2, "Arica": 1, "Sede Virtual - Online": 1, "Brasil": 1, "Providencia": 2, "Agustinas": 1, "Maipú": 1, "Temuco": 1}, "No_matriculados": {"Providencia": 1}}, "por_profesional": {"Consultas": {"Oscar Cayul": 27, "Teresa Monardes": 99, "Daniel Araya": 45, "Daniela Aros": 41, "Paula Noya": 19, "Ivonne Peñailillo": 25, "Santiago Valenzuela": 19, "Scottie Burdiles": 13, "Angélica Álvarez": 49, "Carolina Rojas": 28, "Yisví Paz": 141, "Javiera Carvajal": 69, "Cynthia Gatica": 48, "Tatiana Elgueta": 13}, "Atenciones": {"Ivonne Peñailillo": 71, "Tatiana Elgueta": 25, "Daniela Aros": 34, "Paula Noya": 28, "Carolina Rojas": 40, "Teresa Monardes": 13, "Yisví Paz": 58, "Daniel Araya": 47, "Cynthia Gatica": 73, "Angélica Álvarez": 44, "Santiago Valenzuela": 53, "Javiera Carvajal": 14, "Scottie Burdiles": 16, "Oscar Cayul": 34}, "Prematricula_realizadas": {"Cynthia Gatica": 2, "Paula Noya": 2, "Daniel Araya": 1, "Ivonne Peñailillo": 1, "Oscar Cayul": 1}, "Matriculados": {"Cynthia Gatica": 2, "Paula Noya": 2, "Daniel Araya": 1, "Ivonne Peñailillo": 1, "Oscar Cayul": 1, "Carolina Rojas": 1, "Daniela Aros": 1, "Yessenia Berríos": 1}, "No_matriculados": {"Ivonne Peñailillo": 1}}, "detalle_atenciones": {"Realizada": 444, "No realizada": 106}, "tema_total": {"Orientación Vocacional": 213, "Estrategias de Estudio": 112, "Otras consultas al asesor vocacional": 183, "Bienestar Emocional": 49, "Postulaciones Universidades": 24, "Ponderaciones y Puntajes Carreras": 16, "Gratuidad, Becas y Créditos": 34, "Aranceles Universidades": 2, "Sin categoría": 3}, "modalidad_atenciones_sede": {"Providencia": {"Presencial": 65}, "Plaza Egaña": {"Presencial": 25}, "La Florida": {"Presencial": 27, "Virtual": 3}, "Brasil": {"Presencial": 18, "Virtual": 6}, "Maipú": {"Presencial": 34, "Virtual": 3}, "Sede Virtual - Online": {"Virtual": 12}, "San Miguel": {"Virtual": 3, "Presencial": 37}, "Rancagua": {"Virtual": 13}, "Apoquindo": {"Presencial": 34}, "San Bernardo": {"Presencial": 22, "Virtual": 5}, "Temuco": {"Presencial": 30, "Virtual": 2}, "Talca": {"Virtual": 11}, "Curicó": {"Virtual": 6}, "Recoleta": {"Presencial": 29}, "Chillán": {"Virtual": 17, "Presencial": 1}, "Valparaíso": {"Virtual": 9}, "Viña del Mar": {"Virtual": 4}, "Puente Alto": {"Presencial": 46}, "Puerto Montt": {"Virtual": 2}, "Reñaca": {"Virtual": 2}, "Arica": {"Virtual": 3}, "San Carlos de Apoquindo": {"Presencial": 9}, "Valdivia": {"Virtual": 3}, "Quilpué": {"Virtual": 4}, "Quillota": {"Virtual": 4}, "Calama": {"Virtual": 6}, "Peñalolén": {"Virtual": 3, "Presencial": 3}, "Los Ángeles": {"Virtual": 2}, "Osorno": {"Virtual": 5}, "Melipilla": {"Virtual": 2}, "La Serena": {"Virtual": 2}, "Vitacura": {"Presencial": 2}, "Iquique": {"Virtual": 1}, "Chicureo": {"Virtual": 1}, "Agustinas": {"Presencial": 27, "Virtual": 1}, "Concepción": {"Virtual": 3}, "San Pedro de la Paz": {"Virtual": 3}}, "modalidad_atenciones_prof": {"Ivonne Peñailillo": {"Presencial": 68, "Virtual": 3}, "Tatiana Elgueta": {"Presencial": 25}, "Daniela Aros": {"Presencial": 27, "Virtual": 7}, "Paula Noya": {"Presencial": 18, "Virtual": 10}, "Carolina Rojas": {"Presencial": 34, "Virtual": 6}, "Teresa Monardes": {"Virtual": 13}, "Yisví Paz": {"Virtual": 21, "Presencial": 37}, "Daniel Araya": {"Presencial": 36, "Virtual": 11}, "Cynthia Gatica": {"Presencial": 68, "Virtual": 5}, "Angélica Álvarez": {"Presencial": 30, "Virtual": 14}, "Santiago Valenzuela": {"Presencial": 39, "Virtual": 14}, "Javiera Carvajal": {"Virtual": 14}, "Scottie Burdiles": {"Virtual": 16}, "Oscar Cayul": {"Virtual": 7, "Presencial": 27}}, "modalidad_prematricula_sede": {"San Bernardo": {"Presencial": 2}, "Arica": {"Virtual": 1}, "Sede Virtual - Online": {"Virtual": 1}, "Brasil": {"Presencial": 1}, "Providencia": {"Presencial": 1}, "Agustinas": {"Virtual": 1}}, "modalidad_prematricula_prof": {"Cynthia Gatica": {"Presencial": 2}, "Paula Noya": {"Virtual": 1, "Presencial": 1}, "Daniel Araya": {"Virtual": 1}, "Ivonne Peñailillo": {"Presencial": 1}, "Oscar Cayul": {"Virtual": 1}}, "tema_plataforma": {"Orientación Vocacional": {"App": 120, "Web": 93}, "Estrategias de Estudio": {"Web": 40, "App": 72}, "Otras consultas al asesor vocacional": {"Web": 46, "App": 137}, "Bienestar Emocional": {"App": 30, "Web": 19}, "Postulaciones Universidades": {"App": 18, "Web": 6}, "Ponderaciones y Puntajes Carreras": {"App": 13, "Web": 3}, "Gratuidad, Becas y Créditos": {"App": 26, "Web": 8}, "Aranceles Universidades": {"App": 1, "Web": 1}, "Sin categoría": {"Sin dato": 3}}}, "Junio": {"por_sede": {"Consultas": {"Los Ángeles": 13, "Puerto Montt": 11, "Temuco": 12, "PDV Online": 15, "Curicó": 20, "Sede Virtual": 66, "Maipú": 22, "Chicureo": 2, "Calama": 8, "San Bernardo": 12, "Puente Alto": 14, "Apoquindo": 7, "La Florida": 30, "La Serena": 14, "Chillán": 18, "Concepción": 10, "Melipilla": 13, "Talca": 23, "Viña del Mar": 19, "Vitacura": 1, "Providencia": 14, "Recoleta": 7, "Peñalolén": 1, "Quillota": 18, "Quilpué": 16, "Reñaca": 8, "Agustinas": 7, "Antofagasta": 2, "Osorno": 6, "Lampa Express": 1, "Brasil": 3, "Rancagua": 55, "San Pedro de la Paz": 7, "Arica": 6, "Iquique": 10, "San Carlos de Apoquindo": 1, "Valparaíso": 4, "San Miguel": 44, "Plaza Egaña": 18, "Valdivia": 9}, "Derivaciones": {"Maipú": 9, "La Florida": 2, "Sede Virtual": 3, "Antofagasta": 3, "Apoquindo": 3, "Rancagua": 2, "San Bernardo": 4, "San Miguel": 4, "Plaza Egaña": 6, "CPV-Peñalolen": 2, "Providencia": 2, "Melipilla": 4, "Los Ángeles": 2, "Valdivia": 1, "Iquique": 4, "Viña del Mar": 2, "Chicureo": 4, "Quillota": 1, "Recoleta": 1, "Arica": 1, "Osorno": 1}, "Atenciones": {"Chillán": 9, "San Bernardo": 29, "Apoquindo": 27, "Plaza Egaña": 37, "Quillota": 3, "Brasil": 19, "Talca": 9, "Puente Alto": 47, "Iquique": 11, "La Florida": 46, "Sede Virtual - Online": 22, "San Miguel": 19, "Melipilla": 7, "Valdivia": 7, "Vitacura": 5, "Temuco": 36, "San Carlos de Apoquindo": 12, "Valparaíso": 14, "Recoleta": 34, "Viña del Mar": 4, "Rancagua": 10, "Osorno": 3, "Providencia": 69, "La Serena": 3, "Puerto Montt": 5, "Los Ángeles": 9, "Curicó": 3, "Reñaca": 2, "Quilpué": 4, "Peñalolén": 2, "Concepción": 1, "San Pedro de la Paz": 1, "Arica": 1, "Maipú": 44, "Agustinas": 17, "Calama": 5, "Chicureo": 1}, "Prematricula_realizadas": {"Plaza Egaña": 1, "San Pedro de la Paz": 1, "Recoleta": 1, "Melipilla": 1}, "Matriculados": {"Plaza Egaña": 1, "San Pedro de la Paz": 1, "Recoleta": 1, "Melipilla": 1}}, "por_profesional": {"Consultas": {"Angélica Álvarez": 58, "Carolina Rojas": 17, "Cynthia Gatica": 25, "Daniel Araya": 49, "Daniela Aros": 46, "Ivonne Peñailillo": 15, "Javiera Carvajal": 59, "Oscar Cayul": 25, "Paula Noya": 24, "Santiago Valenzuela": 25, "Scottie Burdiles": 33, "Tatiana Elgueta": 25, "Teresa Monardes": 84, "Yisví Paz": 82}, "Atenciones": {"Scottie Burdiles": 8, "Cynthia Gatica": 76, "Daniel Araya": 49, "Tatiana Elgueta": 37, "Javiera Carvajal": 13, "Paula Noya": 34, "Daniela Aros": 50, "Yisví Paz": 25, "Teresa Monardes": 28, "Angélica Álvarez": 54, "Santiago Valenzuela": 64, "Ivonne Peñailillo": 71, "Carolina Rojas": 44, "Oscar Cayul": 24}, "Prematricula_realizadas": {"Tatiana Elgueta": 1, "Scottie Burdiles": 1, "Santiago Valenzuela": 1, "Paula Noya": 1}, "Matriculados": {"Tatiana Elgueta": 1, "Scottie Burdiles": 1, "Santiago Valenzuela": 1, "Paula Noya": 1}}, "detalle_atenciones": {"Realizada": 468, "No realizada": 109}, "tema_total": {"Orientación Vocacional": 192, "Ponderaciones y Puntajes Carreras": 21, "Otras consultas al asesor vocacional": 164, "Postulaciones Universidades": 20, "Estrategias de Estudio": 79, "Gratuidad, Becas y Créditos": 44, "Bienestar Emocional": 41, "Aranceles Universidades": 5, "Sin categoría": 1}, "modalidad_atenciones_sede": {"Chillán": {"Virtual": 9}, "San Bernardo": {"Presencial": 25, "Virtual": 4}, "Apoquindo": {"Presencial": 27}, "Plaza Egaña": {"Presencial": 37}, "Quillota": {"Virtual": 3}, "Brasil": {"Presencial": 18, "Virtual": 1}, "Talca": {"Virtual": 9}, "Puente Alto": {"Presencial": 47}, "Iquique": {"Virtual": 11}, "La Florida": {"Presencial": 40, "Virtual": 6}, "Sede Virtual - Online": {"Virtual": 22}, "San Miguel": {"Presencial": 17, "Virtual": 2}, "Melipilla": {"Virtual": 7}, "Valdivia": {"Virtual": 7}, "Vitacura": {"Presencial": 5}, "Temuco": {"Presencial": 34, "Virtual": 2}, "San Carlos de Apoquindo": {"Presencial": 12}, "Valparaíso": {"Virtual": 14}, "Recoleta": {"Presencial": 33, "Virtual": 1}, "Viña del Mar": {"Virtual": 4}, "Rancagua": {"Virtual": 10}, "Osorno": {"Virtual": 3}, "Providencia": {"Presencial": 69}, "La Serena": {"Virtual": 3}, "Puerto Montt": {"Virtual": 5}, "Los Ángeles": {"Virtual": 9}, "Curicó": {"Virtual": 3}, "Reñaca": {"Virtual": 2}, "Quilpué": {"Virtual": 4}, "Peñalolén": {"Presencial": 2}, "Concepción": {"Virtual": 1}, "San Pedro de la Paz": {"Virtual": 1}, "Arica": {"Virtual": 1}, "Maipú": {"Presencial": 37, "Virtual": 7}, "Agustinas": {"Presencial": 16, "Virtual": 1}, "Calama": {"Virtual": 5}, "Chicureo": {"Virtual": 1}}, "modalidad_atenciones_prof": {"Scottie Burdiles": {"Virtual": 8}, "Cynthia Gatica": {"Presencial": 72, "Virtual": 4}, "Daniel Araya": {"Presencial": 32, "Virtual": 17}, "Tatiana Elgueta": {"Presencial": 37}, "Javiera Carvajal": {"Virtual": 13}, "Paula Noya": {"Presencial": 18, "Virtual": 16}, "Daniela Aros": {"Presencial": 40, "Virtual": 10}, "Yisví Paz": {"Presencial": 17, "Virtual": 8}, "Teresa Monardes": {"Virtual": 28}, "Angélica Álvarez": {"Presencial": 34, "Virtual": 20}, "Santiago Valenzuela": {"Presencial": 45, "Virtual": 19}, "Ivonne Peñailillo": {"Presencial": 71}, "Carolina Rojas": {"Presencial": 36, "Virtual": 8}, "Oscar Cayul": {"Presencial": 17, "Virtual": 7}}, "modalidad_prematricula_sede": {"Plaza Egaña": {"Presencial": 1}, "San Pedro de la Paz": {"Virtual": 1}, "Recoleta": {"Presencial": 1}, "Melipilla": {"Virtual": 1}}, "modalidad_prematricula_prof": {"Tatiana Elgueta": {"Presencial": 1}, "Scottie Burdiles": {"Virtual": 1}, "Santiago Valenzuela": {"Presencial": 1}, "Paula Noya": {"Virtual": 1}}, "tema_plataforma": {"Orientación Vocacional": {"App": 91, "Web": 101}, "Ponderaciones y Puntajes Carreras": {"Web": 5, "App": 16}, "Otras consultas al asesor vocacional": {"App": 125, "Web": 39}, "Postulaciones Universidades": {"Web": 7, "App": 13}, "Estrategias de Estudio": {"App": 44, "Web": 35}, "Gratuidad, Becas y Créditos": {"App": 27, "Web": 17}, "Bienestar Emocional": {"App": 31, "Web": 10}, "Aranceles Universidades": {"App": 5}, "Sin categoría": {"Sin dato": 1}}}, "Julio": {"por_sede": {"Consultas": {"Agustinas": 6, "Apoquindo": 2, "La Florida": 25, "Brasil": 7, "Providencia": 12, "La Serena": 20, "Antofagasta": 2, "Calama": 8, "Chillán": 14, "Concepción": 8, "Los Ángeles": 15, "Maipú": 18, "Melipilla": 4, "Osorno": 7, "Puerto Montt": 4, "Quillota": 2, "Quilpué": 7, "Rancagua": 31, "San Bernardo": 11, "San Pedro de la Paz": 1, "Talca": 23, "Temuco": 23, "Valdivia": 4, "Viña del Mar": 7, "Recoleta": 4, "Vitacura": 4, "Puente Alto": 7, "Plaza Egaña": 13, "PDV Online": 12, "Curicó": 3, "Reñaca": 10, "Chicureo": 1, "Arica": 2, "Iquique": 3, "Valparaíso": 6, "Sede Virtual": 53, "San Miguel": 43, "Peñalolén": 5}, "Derivaciones": {"Arica": 3, "Providencia": 6, "Plaza Egaña": 6, "Rancagua": 5, "Osorno": 3, "Sede Virtual": 3, "La Florida": 1, "San Miguel": 4, "San Carlos de Apoquindo": 3, "Melipilla": 1, "La Serena": 1, "Maipú": 6, "Viña del Mar": 1, "Chicureo": 3, "Talca": 6, "Concepción": 1, "Valparaíso": 2, "San Bernardo": 3, "Recoleta": 1, "Apoquindo": 3, "Los Ángeles": 1, "Puente Alto": 1, "Antofagasta": 1}, "Atenciones": {"San Miguel": 33, "Melipilla": 5, "Quillota": 3, "Plaza Egaña": 37, "Brasil": 39, "Viña del Mar": 1, "La Florida": 41, "Apoquindo": 40, "Puente Alto": 66, "Quilpué": 5, "Sede Virtual - Online": 21, "Valdivia": 7, "Vitacura": 5, "Valparaíso": 13, "Rancagua": 12, "San Pedro de la Paz": 6, "Iquique": 3, "Chillán": 16, "San Bernardo": 17, "Talca": 9, "Providencia": 89, "Temuco": 44, "Los Ángeles": 15, "Recoleta": 27, "San Carlos de Apoquindo": 12, "Arica": 3, "Reñaca": 1, "Concepción": 5, "La Serena": 7, "Curicó": 4, "Puerto Montt": 4, "Maipú": 52, "Chicureo": 5, "Peñalolén": 14, "Antofagasta": 3, "Agustinas": 24, "Osorno": 7, "Calama": 3}, "Prematricula_realizadas": {"La Florida": 1, "Iquique": 2, "Plaza Egaña": 2}, "Prematricula_no_realizadas": {"San Pedro de la Paz": 1, "Plaza Egaña": 1}, "Matriculados": {"La Florida": 1, "Plaza Egaña": 2, "Iquique": 1, "San Pedro de la Paz": 1}, "No_matriculados": {"Iquique": 1, "Plaza Egaña": 1}}, "por_profesional": {"Consultas": {"Oscar Cayul": 24, "Daniel Araya": 33, "Daniela Aros": 45, "Paula Noya": 18, "Ivonne Peñailillo": 17, "Scottie Burdiles": 25, "Angélica Álvarez": 45, "Carolina Rojas": 19, "Yisví Paz": 62, "Javiera Carvajal": 11, "Cynthia Gatica": 17, "Tatiana Elgueta": 12, "Teresa Monardes": 66, "Santiago Valenzuela": 33}, "Atenciones": {"Yisví Paz": 33, "Daniel Araya": 59, "Javiera Carvajal": 9, "Tatiana Elgueta": 37, "Paula Noya": 50, "Daniela Aros": 49, "Cynthia Gatica": 83, "Teresa Monardes": 28, "Santiago Valenzuela": 64, "Scottie Burdiles": 25, "Angélica Álvarez": 67, "Ivonne Peñailillo": 102, "Carolina Rojas": 57, "Oscar Cayul": 35}, "Prematricula_realizadas": {"Daniela Aros": 1, "Paula Noya": 2, "Tatiana Elgueta": 2}, "Prematricula_no_realizadas": {"Scottie Burdiles": 1, "Tatiana Elgueta": 1}, "Matriculados": {"Daniela Aros": 1, "Tatiana Elgueta": 2, "Paula Noya": 1, "Scottie Burdiles": 1}, "No_matriculados": {"Paula Noya": 1, "Tatiana Elgueta": 1}}, "detalle_atenciones": {"Realizada": 586, "No realizada": 112}, "tema_total": {"Orientación Vocacional": 148, "Bienestar Emocional": 31, "Otras consultas al asesor vocacional": 125, "Postulaciones Universidades": 21, "Estrategias de Estudio": 65, "Ponderaciones y Puntajes Carreras": 15, "Aranceles Universidades": 1, "Gratuidad, Becas y Créditos": 19, "Sin categoría": 2}, "modalidad_atenciones_sede": {"San Miguel": {"Presencial": 26, "Virtual": 7}, "Melipilla": {"Virtual": 5}, "Quillota": {"Virtual": 3}, "Plaza Egaña": {"Presencial": 36, "Virtual": 1}, "Brasil": {"Presencial": 37, "Virtual": 2}, "Viña del Mar": {"Virtual": 1}, "La Florida": {"Presencial": 37, "Virtual": 4}, "Apoquindo": {"Presencial": 39, "Virtual": 1}, "Puente Alto": {"Presencial": 64, "Virtual": 2}, "Quilpué": {"Virtual": 5}, "Sede Virtual - Online": {"Virtual": 21}, "Valdivia": {"Virtual": 7}, "Vitacura": {"Presencial": 2, "Virtual": 3}, "Valparaíso": {"Virtual": 13}, "Rancagua": {"Virtual": 12}, "San Pedro de la Paz": {"Virtual": 6}, "Iquique": {"Virtual": 3}, "Chillán": {"Virtual": 16}, "San Bernardo": {"Presencial": 17}, "Talca": {"Virtual": 9}, "Providencia": {"Virtual": 1, "Presencial": 88}, "Temuco": {"Presencial": 42, "Virtual": 2}, "Los Ángeles": {"Virtual": 15}, "Recoleta": {"Presencial": 26, "Virtual": 1}, "San Carlos de Apoquindo": {"Presencial": 12}, "Arica": {"Virtual": 3}, "Reñaca": {"Virtual": 1}, "Concepción": {"Virtual": 5}, "La Serena": {"Virtual": 7}, "Curicó": {"Virtual": 4}, "Puerto Montt": {"Virtual": 4}, "Maipú": {"Virtual": 12, "Presencial": 40}, "Chicureo": {"Virtual": 5}, "Peñalolén": {"Presencial": 13, "Virtual": 1}, "Antofagasta": {"Virtual": 3}, "Agustinas": {"Presencial": 22, "Virtual": 2}, "Osorno": {"Virtual": 7}, "Calama": {"Virtual": 3}}, "modalidad_atenciones_prof": {"Yisví Paz": {"Presencial": 25, "Virtual": 8}, "Daniel Araya": {"Virtual": 18, "Presencial": 41}, "Javiera Carvajal": {"Virtual": 9}, "Tatiana Elgueta": {"Presencial": 36, "Virtual": 1}, "Paula Noya": {"Presencial": 37, "Virtual": 13}, "Daniela Aros": {"Presencial": 37, "Virtual": 12}, "Cynthia Gatica": {"Presencial": 81, "Virtual": 2}, "Teresa Monardes": {"Virtual": 28}, "Santiago Valenzuela": {"Virtual": 25, "Presencial": 39}, "Scottie Burdiles": {"Virtual": 25}, "Angélica Álvarez": {"Presencial": 42, "Virtual": 25}, "Ivonne Peñailillo": {"Presencial": 101, "Virtual": 1}, "Carolina Rojas": {"Virtual": 17, "Presencial": 40}, "Oscar Cayul": {"Virtual": 13, "Presencial": 22}}, "modalidad_prematricula_sede": {"La Florida": {"Virtual": 1}, "Iquique": {"Virtual": 2}, "Plaza Egaña": {"Presencial": 3}, "San Pedro de la Paz": {"Virtual": 1}}, "modalidad_prematricula_prof": {"Daniela Aros": {"Virtual": 1}, "Paula Noya": {"Virtual": 2}, "Tatiana Elgueta": {"Presencial": 3}, "Scottie Burdiles": {"Virtual": 1}}, "tema_plataforma": {"Orientación Vocacional": {"Web": 81, "App": 67}, "Bienestar Emocional": {"Web": 18, "App": 13}, "Otras consultas al asesor vocacional": {"App": 85, "Web": 40}, "Postulaciones Universidades": {"Web": 7, "App": 14}, "Estrategias de Estudio": {"Web": 27, "App": 38}, "Ponderaciones y Puntajes Carreras": {"App": 7, "Web": 8}, "Aranceles Universidades": {"App": 1}, "Gratuidad, Becas y Créditos": {"App": 19}, "Sin categoría": {"Sin dato": 2}}}, "Agosto": {"por_sede": {"Consultas": {"Agustinas": 11, "Apoquindo": 3, "La Florida": 11, "Providencia": 15, "La Serena": 13, "Calama": 12, "Chillán": 7, "Concepción": 8, "Los Ángeles": 4, "Maipú": 20, "Melipilla": 11, "Osorno": 12, "Puerto Montt": 5, "Quillota": 4, "Quilpué": 9, "Rancagua": 25, "San Bernardo": 10, "Talca": 12, "Temuco": 20, "Valdivia": 5, "Viña del Mar": 12, "Vitacura": 2, "Puente Alto": 13, "Plaza Egaña": 26, "PDV Online": 2, "Curicó": 7, "Chicureo": 9, "Arica": 4, "Iquique": 1, "Valparaíso": 2, "Sede Virtual": 29, "San Miguel": 20}, "Derivaciones": {"Rancagua": 2, "San Miguel": 2, "San Bernardo": 5, "Melipilla": 1, "Maipú": 9, "Providencia": 2, "Plaza Egaña": 4, "Talca": 2, "Chicureo": 1, "Puente Alto": 1, "Los Ángeles": 1, "Valparaíso": 2, "Puerto Montt": 1, "Iquique": 3, "Recoleta": 1, "Temuco": 1, "Reñaca": 1, "La Serena": 1, "Sede Virtual": 1, "Arica": 1}, "Atenciones": {"Curicó": 9, "Chillán": 46, "Plaza Egaña": 48, "Brasil": 30, "Apoquindo": 39, "Talca": 8, "Puente Alto": 63, "Sede Virtual - Online": 21, "Arica": 5, "Iquique": 5, "Concepción": 12, "Temuco": 25, "Los Ángeles": 14, "La Florida": 16, "San Pedro de la Paz": 7, "Providencia": 82, "Peñalolén": 10, "Rancagua": 7, "Puerto Montt": 2, "Valdivia": 2, "San Carlos de Apoquindo": 9, "Valparaíso": 11, "Reñaca": 7, "Recoleta": 15, "Vitacura": 6, "San Miguel": 15, "Viña del Mar": 6, "Melipilla": 6, "Quilpué": 3, "Osorno": 6, "Quillota": 2, "San Bernardo": 30, "La Serena": 7, "Agustinas": 23, "Calama": 4, "Maipú": 42, "Chicureo": 11}, "Prematricula_realizadas": {"Brasil": 1, "Iquique": 1, "Puente Alto": 1, "San Miguel": 1, "Valparaíso": 2}, "Matriculados": {"San Miguel": 1}, "No_matriculados": {"Brasil": 1, "Iquique": 1, "Puente Alto": 1, "Valparaíso": 2}}, "por_profesional": {"Consultas": {"Oscar Cayul": 23, "Daniel Araya": 28, "Daniela Aros": 16, "Paula Noya": 16, "Ivonne Peñailillo": 15, "Scottie Burdiles": 13, "Angélica Ruth Alvarez": 36, "Carolina Rojas": 29, "YISVI MAIRA PAZ": 57, "Javiera Carvajal": 25, "Cynthia Gatica": 23, "Teresa Monardes": 36, "Tatiana Elgueta": 25, "Santiago Valenzuela": 2}, "Atenciones": {"Angélica Álvarez": 50, "Scottie Burdiles": 66, "Tatiana Elgueta": 48, "Paula Noya": 42, "Daniel Araya": 59, "Teresa Monardes": 22, "Daniela Aros": 22, "Ivonne Peñailillo": 93, "Santiago Valenzuela": 37, "Yisví Paz": 27, "Javiera Carvajal": 16, "Cynthia Gatica": 92, "Oscar Cayul": 27, "Carolina Rojas": 53}, "Prematricula_realizadas": {"Paula Noya": 2, "Cynthia Gatica": 1, "Yisví Paz": 1, "Santiago Valenzuela": 2}, "Matriculados": {"Yisví Paz": 1}, "No_matriculados": {"Paula Noya": 2, "Cynthia Gatica": 1, "Santiago Valenzuela": 2}}, "detalle_atenciones": {"Realizada": 576, "No realizada": 78}, "tema_total": {"Otras consultas al asesor vocacional": 79, "Orientación Vocacional": 105, "Aranceles Universidades": 2, "Postulaciones Universidades": 25, "Gratuidad, Becas y Créditos": 40, "Estrategias de Estudio": 47, "Ponderaciones y Puntajes Carreras": 17, "Bienestar Emocional": 29}, "modalidad_atenciones_sede": {"Curicó": {"Virtual": 9}, "Chillán": {"Virtual": 10, "Presencial": 36}, "Plaza Egaña": {"Presencial": 47, "Virtual": 1}, "Brasil": {"Presencial": 29, "Virtual": 1}, "Apoquindo": {"Presencial": 38, "Virtual": 1}, "Talca": {"Virtual": 8}, "Puente Alto": {"Virtual": 1, "Presencial": 62}, "Sede Virtual - Online": {"Virtual": 20, "Presencial": 1}, "Arica": {"Virtual": 5}, "Iquique": {"Virtual": 5}, "Concepción": {"Virtual": 12}, "Temuco": {"Presencial": 22, "Virtual": 3}, "Los Ángeles": {"Virtual": 14}, "La Florida": {"Presencial": 13, "Virtual": 3}, "San Pedro de la Paz": {"Virtual": 7}, "Providencia": {"Presencial": 81, "Virtual": 1}, "Peñalolén": {"Presencial": 10}, "Rancagua": {"Virtual": 7}, "Puerto Montt": {"Virtual": 2}, "Valdivia": {"Virtual": 2}, "San Carlos de Apoquindo": {"Presencial": 8, "Virtual": 1}, "Valparaíso": {"Virtual": 11}, "Reñaca": {"Virtual": 7}, "Recoleta": {"Presencial": 15}, "Vitacura": {"Presencial": 6}, "San Miguel": {"Presencial": 15}, "Viña del Mar": {"Virtual": 6}, "Melipilla": {"Virtual": 6}, "Quilpué": {"Virtual": 3}, "Osorno": {"Virtual": 6}, "Quillota": {"Virtual": 2}, "San Bernardo": {"Presencial": 26, "Virtual": 4}, "La Serena": {"Virtual": 7}, "Agustinas": {"Presencial": 22, "Virtual": 1}, "Calama": {"Virtual": 4}, "Maipú": {"Presencial": 34, "Virtual": 8}, "Chicureo": {"Virtual": 11}}, "modalidad_atenciones_prof": {"Angélica Álvarez": {"Virtual": 28, "Presencial": 22}, "Scottie Burdiles": {"Virtual": 29, "Presencial": 37}, "Tatiana Elgueta": {"Presencial": 47, "Virtual": 1}, "Paula Noya": {"Presencial": 29, "Virtual": 13}, "Daniel Araya": {"Presencial": 44, "Virtual": 15}, "Teresa Monardes": {"Virtual": 22}, "Daniela Aros": {"Presencial": 13, "Virtual": 9}, "Ivonne Peñailillo": {"Presencial": 91, "Virtual": 2}, "Santiago Valenzuela": {"Presencial": 23, "Virtual": 14}, "Yisví Paz": {"Presencial": 15, "Virtual": 12}, "Javiera Carvajal": {"Virtual": 16}, "Cynthia Gatica": {"Presencial": 88, "Virtual": 4}, "Oscar Cayul": {"Presencial": 22, "Virtual": 5}, "Carolina Rojas": {"Presencial": 34, "Virtual": 19}}, "modalidad_prematricula_sede": {"Brasil": {"Presencial": 1}, "Iquique": {"Virtual": 1}, "Puente Alto": {"Virtual": 1}, "San Miguel": {"Presencial": 1}, "Valparaíso": {"Virtual": 2}}, "modalidad_prematricula_prof": {"Paula Noya": {"Presencial": 1, "Virtual": 1}, "Cynthia Gatica": {"Virtual": 1}, "Yisví Paz": {"Presencial": 1}, "Santiago Valenzuela": {"Virtual": 2}}, "tema_plataforma": {}}};
+
+const evolucionMensual = {"Postulaciones": {"Atenciones": 435, "Consultas": 97, "Derivaciones": 0, "Prematricula_realizadas": 0, "Prematricula_no_realizadas": 0, "Matriculados": 0, "No_matriculados": 0}, "Enero": {"Atenciones": 94, "Consultas": 40, "Derivaciones": 0, "Prematricula_realizadas": 46, "Prematricula_no_realizadas": 13, "Matriculados": 31, "No_matriculados": 0}, "Febrero": {"Atenciones": 68, "Consultas": 75, "Derivaciones": 0, "Prematricula_realizadas": 53, "Prematricula_no_realizadas": 8, "Matriculados": 40, "No_matriculados": 13}, "Marzo": {"Atenciones": 255, "Consultas": 369, "Derivaciones": 0, "Prematricula_realizadas": 72, "Prematricula_no_realizadas": 5, "Matriculados": 54, "No_matriculados": 18}, "Abril": {"Atenciones": 695, "Consultas": 933, "Derivaciones": 68, "Prematricula_realizadas": 10, "Prematricula_no_realizadas": 1, "Matriculados": 7, "No_matriculados": 9}, "Mayo": {"Atenciones": 550, "Consultas": 636, "Derivaciones": 56, "Prematricula_realizadas": 7, "Prematricula_no_realizadas": 0, "Matriculados": 7, "No_matriculados": 1}, "Junio": {"Atenciones": 577, "Consultas": 567, "Derivaciones": 61, "Prematricula_realizadas": 4, "Prematricula_no_realizadas": 0, "Matriculados": 4, "No_matriculados": 0}, "Julio": {"Atenciones": 698, "Consultas": 427, "Derivaciones": 65, "Prematricula_realizadas": 5, "Prematricula_no_realizadas": 2, "Matriculados": 4, "No_matriculados": 2}, "Agosto": {"Atenciones": 654, "Consultas": 344, "Derivaciones": 42, "Prematricula_realizadas": 6, "Prematricula_no_realizadas": 0, "Matriculados": 1, "No_matriculados": 5}};
+
+const meses = ["Postulaciones","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto"];
+let currentMonth = "Agosto";
+let currentView = "por_sede";
+const charts = {};
+let sortState = { col: 'entidad', asc: true };
+
+function buildMonthTabs() {
+  const el = document.getElementById('month-tabs');
+  let html = meses.map(m => `<button class="month-btn ${m===currentMonth?'active':''}" onclick="setMonth('${m}')">${m}</button>`).join('');
+  html += `<button class="month-btn total-btn ${currentMonth==='Total'?'active':''}" onclick="setMonth('Total')">Total 2026</button>`;
+  el.innerHTML = html;
+}
+
+function setMonth(m) {
+  currentMonth = m;
+  document.getElementById('month-pill').textContent = m === 'Total' ? 'Total 2026' : m + ' 2026';
+  buildMonthTabs();
+  render();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('btn-sede').classList.toggle('active', v==='por_sede');
+  document.getElementById('btn-prof').classList.toggle('active', v==='por_profesional');
+  render();
+}
+
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+// ---------- Aggregation helpers for "Total 2026" ----------
+function mergeFlat(target, source) {
+  Object.entries(source||{}).forEach(([k,v]) => { target[k] = (target[k]||0) + v; });
+}
+function mergeGroup(target, source) {
+  // source: {grupo: {entidad: n}}
+  Object.entries(source||{}).forEach(([grp, obj]) => {
+    target[grp] = target[grp] || {};
+    mergeFlat(target[grp], obj);
+  });
+}
+function mergeNested(target, source) {
+  // source: {entidad: {tema: n}}
+  Object.entries(source||{}).forEach(([ent, obj]) => {
+    target[ent] = target[ent] || {};
+    mergeFlat(target[ent], obj);
+  });
+}
+
+function getDetalleAtencionesParaVista(view) {
+  // En el tab Total, solo suma el detalle Realizada/No realizada de los meses
+  // que efectivamente aportan al total de esa vista (evita mezclar meses que
+  // solo existen en la otra dimensión, como Enero que no tiene sede).
+  const det = {};
+  meses.forEach(m => {
+    const md = data[m] || {};
+    const tieneDatoEnVista = Object.values((md[view]||{}).Atenciones || {}).reduce((a,b)=>a+b,0) > 0;
+    if (tieneDatoEnVista) mergeFlat(det, md.detalle_atenciones);
+  });
+  return det;
+}
+function getMonthData(mes) {
+  if (mes !== 'Total') return data[mes] || {};
+
+  const agg = {
+    por_sede: {}, por_profesional: {}, detalle_atenciones: {},
+    tema_total: {}, tema_plataforma: {},
+    modalidad_atenciones_sede: {}, modalidad_atenciones_prof: {},
+    modalidad_prematricula_sede: {}, modalidad_prematricula_prof: {}
+  };
+  meses.forEach(m => {
+    const md = data[m] || {};
+    mergeGroup(agg.por_sede, md.por_sede);
+    mergeGroup(agg.por_profesional, md.por_profesional);
+    mergeFlat(agg.detalle_atenciones, md.detalle_atenciones);
+    mergeFlat(agg.tema_total, md.tema_total);
+    mergeNested(agg.tema_plataforma, md.tema_plataforma);
+    mergeNested(agg.modalidad_atenciones_sede, md.modalidad_atenciones_sede);
+    mergeNested(agg.modalidad_atenciones_prof, md.modalidad_atenciones_prof);
+    mergeNested(agg.modalidad_prematricula_sede, md.modalidad_prematricula_sede);
+    mergeNested(agg.modalidad_prematricula_prof, md.modalidad_prematricula_prof);
+  });
+  return agg;
+}
+
+// ---------- Charts ----------
+function simpleBar(canvasId, obj, color) {
+  const entries = Object.entries(obj||{}).sort((a,b) => b[1]-a[1]);
+  const labels = entries.map(e => e[0]);
+  const values = entries.map(e => e[1]);
+  const canvas = document.getElementById(canvasId);
+  canvas.parentElement.style.height = Math.max(200, labels.length * 24) + 'px';
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: color, borderRadius: 3, maxBarThickness: 18 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => ' ' + c.parsed.x.toLocaleString('es-CL') } } },
+      layout: { padding: { right: 34 } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { color: '#141414', font: { size: 11.5 } } }
+      }
+    },
+    plugins: [{
+      id: 'dataLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets[0].data.forEach((value, i) => {
+          const bar = chart.getDatasetMeta(0).data[i];
+          ctx.save(); ctx.fillStyle = '#141414'; ctx.font = 'bold 11px sans-serif';
+          ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+          ctx.fillText(value.toLocaleString('es-CL'), bar.x + 6, bar.y); ctx.restore();
+        });
+      }
+    }]
+  });
+}
+
+function modalidadBar(canvasId, modalidadObj) {
+  const allEnt = Object.keys(modalidadObj||{}).filter(k => {
+    const o = modalidadObj[k]||{};
+    return (o['Presencial']||0) + (o['Virtual']||0) > 0;
+  }).sort((a,b) => {
+    const totA = (modalidadObj[a]['Presencial']||0)+(modalidadObj[a]['Virtual']||0);
+    const totB = (modalidadObj[b]['Presencial']||0)+(modalidadObj[b]['Virtual']||0);
+    return totB - totA;
+  });
+  const canvas = document.getElementById(canvasId);
+  canvas.parentElement.style.height = Math.max(160, allEnt.length * 30) + 'px';
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: allEnt,
+      datasets: [
+        { label: 'Presencial', data: allEnt.map(s => (modalidadObj[s]||{})['Presencial']||0), backgroundColor: '#C9900A', borderRadius: 3, maxBarThickness: 14 },
+        { label: 'Virtual', data: allEnt.map(s => (modalidadObj[s]||{})['Virtual']||0), backgroundColor: '#1F4E4A', borderRadius: 3, maxBarThickness: 14 }
+      ]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      layout: { padding: { right: 30 } },
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, color: '#726C5C' } } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { color: '#141414', font: { size: 11.5 } } }
+      }
+    },
+    plugins: [{
+      id: 'modalidadLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, dsIdx) => {
+          const meta = chart.getDatasetMeta(dsIdx);
+          ds.data.forEach((value, i) => {
+            if (!value) return;
+            const bar = meta.data[i];
+            ctx.save(); ctx.fillStyle = '#141414'; ctx.font = 'bold 10px sans-serif';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText(value.toLocaleString('es-CL'), bar.x + 4, bar.y); ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+}
+
+function groupedBar(canvasId, realizObj, matricObj) {
+  const allEnt = Object.keys(realizObj||{}).filter(k => (realizObj[k]||0) > 0)
+    .sort((a,b) => (realizObj[b]||0) - (realizObj[a]||0));
+  const canvas = document.getElementById(canvasId);
+  canvas.parentElement.style.height = Math.max(160, allEnt.length * 30) + 'px';
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: allEnt,
+      datasets: [
+        { label: 'Atención realizada', data: allEnt.map(s => realizObj[s]||0), backgroundColor: '#1F4E4A', borderRadius: 3, maxBarThickness: 14 },
+        { label: 'Matriculado', data: allEnt.map(s => (matricObj||{})[s]||0), backgroundColor: '#C9900A', borderRadius: 3, maxBarThickness: 14 }
+      ]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      layout: { padding: { right: 30 } },
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, color: '#726C5C' } } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { color: '#141414', font: { size: 11.5 } } }
+      }
+    },
+    plugins: [{
+      id: 'groupedLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, dsIdx) => {
+          const meta = chart.getDatasetMeta(dsIdx);
+          ds.data.forEach((value, i) => {
+            if (!value) return;
+            const bar = meta.data[i];
+            ctx.save(); ctx.fillStyle = '#141414'; ctx.font = 'bold 10px sans-serif';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText(value, bar.x + 5, bar.y); ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+}
+
+function temaBar(canvasId, obj) {
+  const entries = Object.entries(obj||{}).sort((a,b) => b[1]-a[1]);
+  const labels = entries.map(e => e[0]);
+  const values = entries.map(e => e[1]);
+  const canvas = document.getElementById(canvasId);
+  canvas.parentElement.style.height = Math.max(180, labels.length * 26) + 'px';
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: '#C9900A', borderRadius: 3, maxBarThickness: 16 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => ' ' + c.parsed.x.toLocaleString('es-CL') } } },
+      layout: { padding: { right: 34 } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { color: '#141414', font: { size: 11 } } }
+      }
+    },
+    plugins: [{
+      id: 'temaLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets[0].data.forEach((value, i) => {
+          const bar = chart.getDatasetMeta(0).data[i];
+          ctx.save(); ctx.fillStyle = '#141414'; ctx.font = 'bold 11px sans-serif';
+          ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+          ctx.fillText(value.toLocaleString('es-CL'), bar.x + 6, bar.y); ctx.restore();
+        });
+      }
+    }]
+  });
+}
+
+function evolBarChart(canvasId, values, color) {
+  const canvas = document.getElementById(canvasId);
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: meses,
+      datasets: [{ data: values, backgroundColor: color, borderRadius: 4, maxBarThickness: 42 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => ' ' + c.parsed.y.toLocaleString('es-CL') } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } }
+      }
+    },
+    plugins: [{
+      id: 'evolBarLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets[0].data.forEach((value, i) => {
+          const bar = chart.getDatasetMeta(0).data[i];
+          ctx.save(); ctx.fillStyle = '#141414'; ctx.font = 'bold 11px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+          ctx.fillText(value.toLocaleString('es-CL'), bar.x, bar.y - 4); ctx.restore();
+        });
+      }
+    }]
+  });
+}
+
+function evolBarChart2Cat(canvasId, labels, values, colors, unidad) {
+  const canvas = document.getElementById(canvasId);
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderRadius: 4, maxBarThickness: 60 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      layout: { padding: { right: 60 } },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { grid: { display: false }, ticks: { color: '#141414', font: { size: 12, weight: '600' } } }
+      }
+    },
+    plugins: [{
+      id: 'bar2catLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets[0].data.forEach((value, i) => {
+          const bar = chart.getDatasetMeta(0).data[i];
+          ctx.save(); ctx.fillStyle = '#141414'; ctx.font = 'bold 13px sans-serif';
+          ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+          ctx.fillText(value.toLocaleString('es-CL') + ' ' + unidad, bar.x + 8, bar.y); ctx.restore();
+        });
+      }
+    }]
+  });
+}
+
+function evolStackedPct(canvasId, labels, pctPresencial, pctVirtual) {
+  const canvas = document.getElementById(canvasId);
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Presencial', data: pctPresencial, backgroundColor: '#C9900A', stack: 's' },
+        { label: 'Virtual', data: pctVirtual, backgroundColor: '#1F4E4A', stack: 's' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 11 }, color: '#726C5C' } },
+        tooltip: { callbacks: { label: (c) => ` ${c.dataset.label}: ${c.parsed.y}%` } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { stacked: true, beginAtZero: true, max: 100, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 }, callback: (v) => v + '%' } }
+      }
+    },
+    plugins: [{
+      id: 'stackedPctLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, dsIdx) => {
+          const meta = chart.getDatasetMeta(dsIdx);
+          ds.data.forEach((value, i) => {
+            if (value < 8) return;
+            const bar = meta.data[i];
+            ctx.save(); ctx.fillStyle = '#FFF8E7'; ctx.font = 'bold 10px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(value + '%', bar.x, bar.y); ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+}
+
+function evolGroupedChart(canvasId, series) {
+  // series: [{label, data, color}]
+  const canvas = document.getElementById(canvasId);
+  destroyChart(canvasId);
+  charts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: meses,
+      datasets: series.map(s => ({ label: s.label, data: s.data, backgroundColor: s.color, borderRadius: 3, maxBarThickness: 22 }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      layout: { padding: { top: 22 } },
+      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, color: '#726C5C' } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#726C5C', font: { size: 11 } } },
+        y: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } }
+      }
+    },
+    plugins: [{
+      id: 'evolGroupedLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((ds, dsIdx) => {
+          const meta = chart.getDatasetMeta(dsIdx);
+          ds.data.forEach((value, i) => {
+            if (!value) return;
+            const bar = meta.data[i];
+            ctx.save(); ctx.fillStyle = '#141414'; ctx.font = 'bold 9px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+            ctx.fillText(value.toLocaleString('es-CL'), bar.x, bar.y - 3); ctx.restore();
+          });
+        });
+      }
+    }]
+  });
+}
+
+// ---------- HTML builders ----------
+function sectionHTML(id, title, kpis, note) {
+  return `<div class="section">
+    <div class="section-title">${title}</div>
+    ${note ? `<div class="section-note">${note}</div>` : ''}
+    ${kpis ? `<div class="kpi-row">${kpis}</div>` : ''}
+    <div class="chart-wrap"><canvas id="${id}"></canvas></div>
+  </div>`;
+}
+
+function emptySection(title, msg) {
+  return `<div class="section"><div class="section-title">${title}</div><div class="empty">${msg || ('Sin datos para ' + currentMonth + '.')}</div></div>`;
+}
+
+function kpi(label, value) {
+  return `<div class="kpi"><div class="kpi-label">${label}</div><div class="kpi-value">${value}</div></div>`;
+}
+
+
+
+function renderPlataformaTable(temaPlataforma) {
+  const PLATAFORMAS = ['App', 'Web'];
+  const temasReales = Object.entries(temaPlataforma||{}).filter(([tema]) => tema !== 'Sin categoría');
+  if (temasReales.length === 0 && !temaPlataforma['Sin categoría']) {
+    return '<div class="empty">Sin datos de plataforma disponibles.</div>';
+  }
+  const entries = temasReales.sort((a,b) => {
+    const totA = Object.values(a[1]).reduce((x,y)=>x+y,0);
+    const totB = Object.values(b[1]).reduce((x,y)=>x+y,0);
+    return totB - totA;
+  });
+  const rows = entries.map(([tema, plats]) => {
+    const total = Object.values(plats).reduce((a,b)=>a+b,0);
+    const cells = PLATAFORMAS.map(p => `<td>${(plats[p]||0).toLocaleString('es-CL')}</td>`).join('');
+    return `<tr><td>${tema}</td>${cells}<td style="font-weight:700;">${total.toLocaleString('es-CL')}</td></tr>`;
+  }).join('');
+
+  // Fila especial: consultas registradas sin tema/plataforma en el archivo de origen
+  const sinCategoria = temaPlataforma['Sin categoría'] || {};
+  const totalSinCategoria = Object.values(sinCategoria).reduce((a,b)=>a+b,0);
+  const filaSinDato = totalSinCategoria > 0
+    ? `<tr><td>No figura en detalle de consulta</td><td>—</td><td>—</td><td style="font-weight:700;">${totalSinCategoria.toLocaleString('es-CL')}</td></tr>`
+    : '';
+
+  // % por plataforma calculado solo sobre consultas con plataforma conocida (App/Web)
+  const grandTotalConocido = entries.reduce((acc,[,plats]) => acc + PLATAFORMAS.reduce((s,p) => s + (plats[p]||0), 0), 0);
+  const totalsByPlat = PLATAFORMAS.map(p => entries.reduce((acc,[,plats]) => acc + (plats[p]||0), 0));
+  const kpisPlataforma = PLATAFORMAS.map((p,i) => {
+    const pct = grandTotalConocido > 0 ? (100*totalsByPlat[i]/grandTotalConocido).toFixed(1) : '0.0';
+    return kpi(p, pct + '%');
+  }).join('');
+
+  return `<div class="kpi-row">${kpisPlataforma}</div>
+    <div class="section-note">% calculado sobre las consultas con plataforma conocida (${grandTotalConocido.toLocaleString('es-CL')}).</div>
+    <table>
+      <thead><tr><th>Tema</th>${PLATAFORMAS.map(p=>`<th>${p}</th>`).join('')}<th>Total</th></tr></thead>
+      <tbody>${rows}${filaSinDato}</tbody>
+    </table>`;
+}
+
+function render() {
+  const md = getMonthData(currentMonth);
+  const view = md[currentView] || {};
+  const isSede = currentView === 'por_sede';
+  const dim = isSede ? 'sede' : 'profesional';
+  const detalle = currentMonth === 'Total' ? getDetalleAtencionesParaVista(currentView) : (md.detalle_atenciones || {});
+
+  const totalAt = Object.values(view.Atenciones||{}).reduce((a,b)=>a+b,0);
+  const totalCo = Object.values(view.Consultas||{}).reduce((a,b)=>a+b,0);
+  const totalDe = Object.values(view.Derivaciones||{}).reduce((a,b)=>a+b,0);
+
+  const matricObjRaw = view.Matriculados || {};
+  const noMatricObj = view.No_matriculados || {};
+  const realizObj = view.Prematricula_realizadas || {};
+  const noRealizObj = view.Prematricula_no_realizadas || {};
+  const allKeysPremat = Array.from(new Set([...Object.keys(matricObjRaw), ...Object.keys(noMatricObj), ...Object.keys(realizObj)]));
+  const matricObjCapped = {};
+  let huboAjuste = false;
+  allKeysPremat.forEach(k => {
+    const raw = matricObjRaw[k]||0;
+    const realiz = realizObj[k]||0;
+    const capped = Math.min(raw, realiz);
+    // Solo se muestra la entidad si tiene un respaldo real: seguimiento realizado con matrícula,
+    // o un resultado de no-matrícula ya registrado. Si solo tiene matrícula sin seguimiento
+    // realizado (como Scottie en Julio: derivado pero atención no concretada), se excluye del todo.
+    if (capped > 0 || (noMatricObj[k]||0) > 0) matricObjCapped[k] = capped;
+    if (raw > capped) huboAjuste = true;
+  });
+  const totalMatCapped = Object.values(matricObjCapped).reduce((a,b)=>a+b,0);
+  const totalMatRaw = Object.values(matricObjRaw).reduce((a,b)=>a+b,0);
+  const totalNoMat = Object.values(noMatricObj).reduce((a,b)=>a+b,0);
+  const totalPrematRealiz = Object.values(realizObj).reduce((a,b)=>a+b,0);
+  const totalPrematNoRealiz = Object.values(noRealizObj).reduce((a,b)=>a+b,0);
+  const totalDerivados = totalPrematRealiz + totalPrematNoRealiz;
+
+  let html = '';
+
+  // ---- Evolución mensual (solo en Total 2026) ----
+  if (currentMonth === 'Total') {
+    const sumaEvol = (campo) => meses.reduce((acc, m2) => acc + (evolucionMensual[m2][campo]||0), 0);
+    const totEvolAtenciones = sumaEvol('Atenciones');
+    const totEvolConsultas = sumaEvol('Consultas');
+    const totEvolDerivaciones = sumaEvol('Derivaciones');
+    const totEvolDerivados = sumaEvol('Prematricula_realizadas') + sumaEvol('Prematricula_no_realizadas');
+    const totEvolRealizadas = sumaEvol('Prematricula_realizadas');
+    const totEvolMatriculados = sumaEvol('Matriculados');
+
+    html += `<div class="section">
+      <div class="section-title">Evolución mensual 2026</div>
+      <div class="section-note">Totales por mes, sin diferenciar por sede o profesional.</div>
+
+      <div class="subsection" style="margin-top:0; padding-top:0; border-top:none;">
+        <div class="subsection-title">Atenciones</div>
+        <div class="kpi-row">${kpi('Total 2026', totEvolAtenciones.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_atenciones"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Consultas / mensajería</div>
+        <div class="kpi-row">${kpi('Total 2026', totEvolConsultas.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_consultas"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Prematrícula: Derivados, Realizadas y Matriculados</div>
+        <div class="kpi-row">${kpi('Derivados', totEvolDerivados.toLocaleString('es-CL')) + kpi('Realizadas', totEvolRealizadas.toLocaleString('es-CL')) + kpi('Matriculados', totEvolMatriculados.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:260px;"><canvas id="c_evol_prematricula"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Derivaciones</div>
+        <div class="kpi-row">${kpi('Total 2026', totEvolDerivaciones.toLocaleString('es-CL'))}</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_derivaciones"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Modalidad: ¿pesa tener presencia física en la sede?</div>
+        <div class="section-note">Comparación de atenciones promedio por sede, agrupando según si la sede tuvo al menos una atención Presencial en el período (Febrero-Julio, único rango con este dato) o si operó 100% Virtual todo el período. La clasificación se calcula desde los datos reales, no desde una lista fija — por eso una sede como Chillán (que partió presencial y hoy opera virtual por licencia de la profesional) cuenta según lo que realmente ocurrió. No implica causalidad: podría ser que ya elegimos poner presencial donde sabíamos que había más demanda.</div>
+        <div class="kpi-row" id="kpi_modalidad_peso"></div>
+        <div class="chart-wrap" style="height:180px;"><canvas id="c_evol_modalidad_peso"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Modalidad: evolución del % Presencial vs Virtual</div>
+        <div class="section-note">Solo Febrero-Julio (Postulaciones y Enero no tienen este dato en su fuente).</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="c_evol_modalidad_pct"></canvas></div>
+      </div>
+    </div>`;
+  }
+
+  // ---- Atenciones ----
+  const atencionesNote = (isSede && (currentMonth === 'Postulaciones' || currentMonth === 'Enero' || currentMonth === 'Total'))
+    ? 'El formulario que permite identificar Atenciones por sede se implementó a partir de Febrero 2026. Postulaciones y Enero solo tienen registro por profesional (esa vista sí las incluye completas).'
+    : null;
+  const detalleTotal = (detalle['Realizada']||0) + (detalle['No realizada']||0);
+  const gapDetalle = totalAt - detalleTotal;
+  let notaDetalle = null;
+  if (detalleTotal === 0) {
+    notaDetalle = 'Este período no distingue Realizada / No realizada en el archivo de origen.';
+  } else if (gapDetalle > 0) {
+    notaDetalle = `De este total, ${gapDetalle.toLocaleString('es-CL')} atención(es) — de Postulaciones — no tienen desglose Realizada / No realizada en su archivo de origen, por eso Realizadas + No realizadas no suma el Total.`;
+  }
+  if (totalAt > 0) {
+    const kpisAtenciones = detalleTotal > 0
+      ? kpi('Total', totalAt.toLocaleString('es-CL')) + kpi('Realizadas', (detalle['Realizada']||0).toLocaleString('es-CL')) + kpi('No realizadas', (detalle['No realizada']||0).toLocaleString('es-CL'))
+      : kpi('Total', totalAt.toLocaleString('es-CL'));
+    html += `<div class="section">
+      <div class="section-title">Atenciones por ${dim}</div>
+      ${[atencionesNote, notaDetalle].filter(Boolean).map(n=>`<div class="section-note">${n}</div>`).join('')}
+      <div class="kpi-row">${kpisAtenciones}</div>
+      <div class="chart-wrap"><canvas id="c_atenciones"></canvas></div>
+    </div>`;
+  } else {
+    html += emptySection(`Atenciones por ${dim}`, atencionesNote || undefined);
+  }
+
+  // ---- Prematrícula ----
+  if (totalPrematRealiz > 0 || totalMatRaw > 0 || totalNoMat > 0 || totalDerivados > 0) {
+    const pct = totalPrematRealiz > 0 ? (100*totalMatCapped/totalPrematRealiz).toFixed(1) : null;
+    const kpisPremat = kpi('Derivados', totalDerivados.toLocaleString('es-CL'))
+      + kpi('Realizadas', totalPrematRealiz.toLocaleString('es-CL'))
+      + kpi('Matriculados', totalMatCapped.toLocaleString('es-CL'))
+      + (pct !== null ? kpi('% Matriculados', pct+'%') : '');
+    html += `<div class="section">
+      <div class="section-title">Prematrícula (seguimiento) por ${dim}</div>
+      <div class="section-note">Derivados = casos asignados para atención (realizadas + no realizadas). Solo cuenta como Matriculado el/la estudiante que figura en el Académico.</div>
+      <div class="kpi-row">${kpisPremat}</div>
+      <div class="chart-wrap"><canvas id="c_prematricula"></canvas></div>
+    </div>`;
+  } else {
+    html += emptySection(`Prematrícula (seguimiento) por ${dim}`);
+  }
+
+  // ---- Modalidad (Atenciones individuales + Prematrícula) ----
+  const modAtObj = isSede ? (md.modalidad_atenciones_sede||{}) : (md.modalidad_atenciones_prof||{});
+  const modPmObj = isSede ? (md.modalidad_prematricula_sede||{}) : (md.modalidad_prematricula_prof||{});
+  const modCombinado = {};
+  [modAtObj, modPmObj].forEach(obj => {
+    Object.entries(obj).forEach(([entidad, vals]) => {
+      modCombinado[entidad] = modCombinado[entidad] || { Presencial: 0, Virtual: 0 };
+      modCombinado[entidad].Presencial += vals['Presencial']||0;
+      modCombinado[entidad].Virtual += vals['Virtual']||0;
+    });
+  });
+  const modCombinadoTotal = Object.values(modCombinado).reduce((acc,o) => acc + o.Presencial + o.Virtual, 0);
+  if (modCombinadoTotal > 0) {
+    html += `<div class="section">
+      <div class="section-title">Modalidad de las atenciones por ${dim}</div>
+      <div class="section-note">Incluye Atenciones individuales + Prematrícula (ambas son atención directa al estudiante/apoderado, solo cambia el motivo). Excepción conocida: 1 atención de sede virtual registrada como Presencial (agosto) corresponde a una estudiante de sede a distancia que fue atendida presencialmente por una situación puntual — el registro es correcto, no un error de modalidad.</div>
+      <div class="chart-wrap"><canvas id="c_modalidad"></canvas></div>
+    </div>`;
+  }
+
+  // ---- Consultas + detalle por tema ----
+  const temaTotal = md.tema_total || {};
+  const temaPlataforma = md.tema_plataforma || {};
+  const plataformaCombinada = (currentMonth === 'Postulaciones' || currentMonth === 'Enero');
+
+  if (totalCo > 0) {
+    html += `<div class="section">
+      <div class="section-title">Consultas / mensajería por ${dim}</div>
+      <div class="kpi-row">${kpi('Total', totalCo.toLocaleString('es-CL'))}</div>
+      <div class="chart-wrap"><canvas id="c_consultas"></canvas></div>
+
+      <div class="subsection">
+        <div class="subsection-title">Detalle por tema</div>
+        <div class="section-note">Incluye "Sin categoría": consultas registradas (con RUT, mes y quien respondió) que no tienen tema ni pregunta/respuesta detallada en el archivo de origen.</div>
+        <div class="chart-wrap" id="wrap_tema"><canvas id="c_tema"></canvas></div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">Detalle por tema y plataforma (App / Web)</div>
+        ${plataformaCombinada ? '<div class="section-note">Postulaciones y Enero comparten un mismo registro de origen en el archivo fuente: no se distinguen entre sí, por eso muestran el mismo desglose.</div>' : ''}
+        <div class="section-note">"No figura en detalle de consulta" agrupa las consultas registradas (con RUT, mes y quien respondió) que llegaron sin tema ni plataforma en el archivo de origen — se cuentan igual, solo en el Total.</div>
+        ${renderPlataformaTable(temaPlataforma)}
+      </div>
+    </div>`;
+  } else {
+    html += emptySection(`Consultas / mensajería por ${dim}`);
+  }
+
+  // ---- Derivaciones ----
+  if (isSede) {
+    html += totalDe > 0
+      ? sectionHTML('c_derivaciones', 'Derivaciones por sede', kpi('Total', totalDe.toLocaleString('es-CL')))
+      : emptySection('Derivaciones por sede');
+  } else {
+    html += `<div class="section"><div class="section-title">Derivaciones por profesional</div><div class="section-note">Esta fuente no registra profesional a propósito (el dato original es el docente que deriva, no el equipo de orientación).</div></div>`;
+  }
+
+  document.getElementById('content').innerHTML = html;
+
+  if (modCombinadoTotal > 0) modalidadBar('c_modalidad', modCombinado);
+
+  if (currentMonth === 'Total') {
+    const evAt = meses.map(m => evolucionMensual[m].Atenciones);
+    const evCo = meses.map(m => evolucionMensual[m].Consultas);
+    const evDe = meses.map(m => evolucionMensual[m].Derivaciones);
+    const evDerivados = meses.map(m => evolucionMensual[m].Prematricula_realizadas + evolucionMensual[m].Prematricula_no_realizadas);
+    const evRealiz = meses.map(m => evolucionMensual[m].Prematricula_realizadas);
+    const evMatCapped = meses.map(m => evolucionMensual[m].Matriculados);
+    evolBarChart('c_evol_atenciones', evAt, '#1F4E4A');
+    evolBarChart('c_evol_consultas', evCo, '#F2B705');
+    evolBarChart('c_evol_derivaciones', evDe, '#C9900A');
+    evolGroupedChart('c_evol_prematricula', [
+      { label: 'Derivados', data: evDerivados, color: '#EAE3D2' },
+      { label: 'Realizadas', data: evRealiz, color: '#1F4E4A' },
+      { label: 'Matriculados', data: evMatCapped, color: '#C9900A' }
+    ]);
+
+    // --- Modalidad: peso de la presencia física (clasificación dinámica por sede) ---
+    const mesesConModalidad = meses.filter(m => m !== 'Postulaciones' && m !== 'Enero');
+    const sedeTotales = {};
+    mesesConModalidad.forEach(m => {
+      const md = data[m].modalidad_atenciones_sede || {};
+      Object.entries(md).forEach(([sede, vals]) => {
+        sedeTotales[sede] = sedeTotales[sede] || { Presencial: 0, Virtual: 0 };
+        sedeTotales[sede].Presencial += vals['Presencial'] || 0;
+        sedeTotales[sede].Virtual += vals['Virtual'] || 0;
+      });
+    });
+    let nPres = 0, totPres = 0, nVirt = 0, totVirt = 0;
+    Object.values(sedeTotales).forEach(v => {
+      const tot = v.Presencial + v.Virtual;
+      if (v.Presencial > 0) { nPres++; totPres += tot; }
+      else { nVirt++; totVirt += tot; }
+    });
+    const promPres = nPres > 0 ? totPres / nPres : 0;
+    const promVirt = nVirt > 0 ? totVirt / nVirt : 0;
+    const razon = promVirt > 0 ? (promPres / promVirt).toFixed(1) : '—';
+
+    document.getElementById('kpi_modalidad_peso').innerHTML =
+      kpi('Sedes con presencia física', nPres) +
+      kpi('Sedes 100% virtuales', nVirt) +
+      kpi('Razón', razon + 'x');
+
+    evolBarChart2Cat('c_evol_modalidad_peso',
+      [`Con presencia física (${nPres} sedes)`, `100% virtuales (${nVirt} sedes)`],
+      [Math.round(promPres*10)/10, Math.round(promVirt*10)/10],
+      ['#C9900A', '#1F4E4A'], 'atenciones promedio / sede'
+    );
+
+    // --- Modalidad: % Presencial vs Virtual por mes ---
+    const pctPresencial = mesesConModalidad.map(m => {
+      const md = data[m].modalidad_atenciones_sede || {};
+      let p = 0, v = 0;
+      Object.values(md).forEach(vals => { p += vals['Presencial']||0; v += vals['Virtual']||0; });
+      return (p+v) > 0 ? Math.round(1000*p/(p+v))/10 : 0;
+    });
+    const pctVirtual = pctPresencial.map(p => Math.round((100-p)*10)/10);
+
+    evolStackedPct('c_evol_modalidad_pct', mesesConModalidad, pctPresencial, pctVirtual);
+  }
+
+
+  if (totalAt > 0) simpleBar('c_atenciones', view.Atenciones, '#1F4E4A');
+  if (totalCo > 0) {
+    simpleBar('c_consultas', view.Consultas, '#F2B705');
+    temaBar('c_tema', temaTotal);
+  }
+  if (totalPrematRealiz > 0 || totalMatRaw > 0 || totalNoMat > 0 || totalDerivados > 0) groupedBar('c_prematricula', realizObj, matricObjCapped);
+  if (isSede && totalDe > 0) simpleBar('c_derivaciones', view.Derivaciones, '#C9900A');
+}
+
+buildMonthTabs();
+render();
+</script>
+</body>
+</html>
