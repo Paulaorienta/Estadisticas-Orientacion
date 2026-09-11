@@ -36,7 +36,7 @@
       <div class="header-title">Programa de Orientación — Preuniversitario Pedro de Valdivia</div>
       <div class="header-sub">Comparativo interanual 2025 vs 2026</div>
     </div>
-    <div class="header-period">Postulaciones + Enero a Julio</div>
+    <div class="header-period">Postulaciones + Enero a Agosto</div>
   </div>
 
   <div class="grid">
@@ -44,8 +44,8 @@
       <div class="section-title">Atenciones individuales</div>
       <div class="section-note">Solicitadas (2025) vs. registradas (2026)</div>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">1.969</div></div>
-        <div class="kpi acc-teal"><div class="kpi-label">Total 2026</div><div class="kpi-value">3.253 <span class="kpi-delta">▲ +65,2%</span></div></div>
+        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">2.348</div></div>
+        <div class="kpi acc-teal"><div class="kpi-label">Total 2026</div><div class="kpi-value">4.026 <span class="kpi-delta">▲ +71,5%</span></div></div>
       </div>
       <div class="chart-wrap"><canvas id="c_atenciones"></canvas></div>
     </div>
@@ -62,17 +62,17 @@
       <div class="section-title">Mensajería (Consultas)</div>
       <div class="section-note">Consultas respondidas por mes</div>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">3.367</div></div>
-        <div class="kpi acc-gold"><div class="kpi-label">Total 2026</div><div class="kpi-value">3.144 <span class="kpi-delta">▼ -6,6%</span></div></div>
+        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">3.671</div></div>
+        <div class="kpi acc-gold"><div class="kpi-label">Total 2026</div><div class="kpi-value">3.488 <span class="kpi-delta">▼ -5,0%</span></div></div>
       </div>
       <div class="chart-wrap"><canvas id="c_mensajeria"></canvas></div>
     </div>
     <div class="section">
       <div class="section-title">WhatsApp — mensajes enviados</div>
-      <div class="section-note">2025 comienza en abril (canal no usado antes). 2026 solo tiene registro hasta mayo en la fuente disponible; Junio y Julio 2026 no están reportados aún.</div>
+      <div class="section-note">2025 comienza en abril (canal no usado antes). 2026 con registro completo enero-agosto.</div>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">Total 2025 (Abr-Jul)</div><div class="kpi-value">1.828</div></div>
-        <div class="kpi acc-teal"><div class="kpi-label">Total 2026 (Ene-May)</div><div class="kpi-value">1.269</div></div>
+        <div class="kpi"><div class="kpi-label">Total 2025 (Abr-Ago)</div><div class="kpi-value">3.356</div></div>
+        <div class="kpi acc-teal"><div class="kpi-label">Total 2026 (Ene-Ago)</div><div class="kpi-value">6.561</div></div>
       </div>
       <div class="chart-wrap"><canvas id="c_whatsapp"></canvas></div>
     </div>
@@ -80,8 +80,8 @@
       <div class="section-title">Talleres — cantidad</div>
       <div class="section-note">N° de talleres dictados (estudiantes + apoderados)</div>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">412</div></div>
-        <div class="kpi acc-gold"><div class="kpi-label">Total 2026</div><div class="kpi-value">200 <span class="kpi-delta">▼ -51,5%</span></div></div>
+        <div class="kpi"><div class="kpi-label">Total 2025</div><div class="kpi-value">475</div></div>
+        <div class="kpi acc-gold"><div class="kpi-label">Total 2026</div><div class="kpi-value">230 <span class="kpi-delta">▼ -51,6%</span></div></div>
       </div>
       <div class="chart-wrap"><canvas id="c_talleres_cant"></canvas></div>
     </div>
@@ -89,35 +89,35 @@
       <div class="section-title">Talleres — % de asistencia</div>
       <div class="section-note">Asistentes ÷ Inscritos, por mes.</div>
       <div class="kpi-row">
-        <div class="kpi"><div class="kpi-label">% Asistencia 2025</div><div class="kpi-value">31,7%</div></div>
-        <div class="kpi acc-gold"><div class="kpi-label">% Asistencia 2026</div><div class="kpi-value">38,3% <span class="kpi-delta">▲ +6,6 pts</span></div></div>
+        <div class="kpi"><div class="kpi-label">% Asistencia 2025</div><div class="kpi-value">30,6%</div></div>
+        <div class="kpi acc-gold"><div class="kpi-label">% Asistencia 2026</div><div class="kpi-value">38,2% <span class="kpi-delta">▲ +7,6 pts</span></div></div>
       </div>
       <div class="chart-wrap"><canvas id="c_talleres_pct"></canvas></div>
     </div>
   </div>
 
-  <div class="footer">Fuentes: RESUMEN ATENCIONES/HORAS 2025 · RESUMEN ATENCIONES 2026 · Consolidado Estadísticas Equipo 2026 · Programa de Orientación PDV · Actualizado 07-08-2026</div>
+  <div class="footer">Fuentes: RESUMEN ATENCIONES/HORAS 2025 · RESUMEN ATENCIONES 2026 · Consolidado Estadísticas Equipo 2026 · Programa de Orientación PDV · Actualizado 11-09-2026</div>
 </div>
 
 <script>
-const labels = ["Postulaciones","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio"];
+const labels = ["Postulaciones","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto"];
 const labels7 = ["Postulaciones","Enero","Febrero","Marzo","Abril","Mayo","Junio"];
 
-const atenciones2025 = [305, 49, 23, 161, 285, 293, 350, 503];
-const atenciones2026 = [435, 94, 68, 255, 695, 550, 571, 585];
+const atenciones2025 = [305, 49, 23, 161, 285, 293, 350, 503, 379];
+const atenciones2026 = [435, 94, 68, 255, 695, 550, 577, 698, 654];
 
-const mensajeria2025 = [178, 72, 79, 383, 878, 590, 590, 597];
-const mensajeria2026 = [97, 40, 75, 369, 933, 636, 567, 427];
+const mensajeria2025 = [178, 72, 79, 383, 878, 590, 590, 597, 304];
+const mensajeria2026 = [97, 40, 75, 369, 933, 636, 567, 427, 344];
 
-const talleresCant2025 = [12, 20, 15, 68, 97, 76, 51, 73];
-const talleresCant2026 = [13, 8, 13, 31, 44, 32, 28, 31];
+const talleresCant2025 = [12, 20, 15, 68, 97, 76, 51, 73, 63];
+const talleresCant2026 = [13, 8, 13, 31, 44, 32, 28, 31, 30];
 
-const talleresPct2025 = [44.0, 41.4, 34.5, 36.8, 31.2, 29.8, 27.2, 32.0];
-const talleresPct2026 = [45.7, 42.7, 35.1, 45.4, 35.4, 36.6, 33.9, 35.0];
+const talleresPct2025 = [44.0, 41.4, 34.5, 36.8, 31.2, 29.8, 27.2, 32.0, 22.2];
+const talleresPct2026 = [45.7, 42.7, 35.1, 45.4, 35.4, 36.6, 33.9, 35.0, 37.7];
 
 // WhatsApp: 2025 recién parte en abril; 2026 la fuente disponible solo llega a mayo (sin Junio/Julio aún)
-const whatsapp2025 = [null, null, null, null, 41, 73, 255, 1459];
-const whatsapp2026 = [null, 177, 97, 260, 326, 409, null, null];
+const whatsapp2025 = [null, null, null, null, 41, 73, 255, 1459, 1528];
+const whatsapp2026 = [null, 177, 97, 260, 326, 409, 1390, 2147, 1755];
 
 const prematricula2025 = [0, 74, 47, 44, 10, 7, 6];
 const prematricula2026 = [0, 46, 53, 72, 10, 7, 4];
