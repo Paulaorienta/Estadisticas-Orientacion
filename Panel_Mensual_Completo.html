@@ -242,25 +242,25 @@ function modalidadBar(canvasId, modalidadObj) {
   });
 }
 
-function groupedBar(canvasId, realizObj, matricObj) {
+function groupedBar(canvasId, realizObj, matricObj, showMatriculado) {
   const allEnt = Object.keys(realizObj||{}).filter(k => (realizObj[k]||0) > 0)
     .sort((a,b) => (realizObj[b]||0) - (realizObj[a]||0));
   const canvas = document.getElementById(canvasId);
   canvas.parentElement.style.height = Math.max(160, allEnt.length * 30) + 'px';
   destroyChart(canvasId);
+  const datasets = [
+    { label: 'Atención realizada', data: allEnt.map(s => realizObj[s]||0), backgroundColor: '#1F4E4A', borderRadius: 3, maxBarThickness: 14 }
+  ];
+  if (showMatriculado) {
+    datasets.push({ label: 'Matriculado', data: allEnt.map(s => (matricObj||{})[s]||0), backgroundColor: '#C9900A', borderRadius: 3, maxBarThickness: 14 });
+  }
   charts[canvasId] = new Chart(canvas, {
     type: 'bar',
-    data: {
-      labels: allEnt,
-      datasets: [
-        { label: 'Atención realizada', data: allEnt.map(s => realizObj[s]||0), backgroundColor: '#1F4E4A', borderRadius: 3, maxBarThickness: 14 },
-        { label: 'Matriculado', data: allEnt.map(s => (matricObj||{})[s]||0), backgroundColor: '#C9900A', borderRadius: 3, maxBarThickness: 14 }
-      ]
-    },
+    data: { labels: allEnt, datasets },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       layout: { padding: { right: 30 } },
-      plugins: { legend: { position: 'top', labels: { font: { size: 11 }, color: '#726C5C' } } },
+      plugins: { legend: { display: showMatriculado, position: 'top', labels: { font: { size: 11 }, color: '#726C5C' } } },
       scales: {
         x: { beginAtZero: true, grid: { color: '#EAE3D2' }, ticks: { color: '#726C5C', font: { size: 11 } } },
         y: { grid: { display: false }, ticks: { color: '#141414', font: { size: 11.5 } } }
@@ -595,13 +595,19 @@ function render() {
   // ---- Prematrícula ----
   if (totalPrematRealiz > 0 || totalMatRaw > 0 || totalNoMat > 0 || totalDerivados > 0) {
     const pct = totalPrematRealiz > 0 ? (100*totalMatCapped/totalPrematRealiz).toFixed(1) : null;
-    const kpisPremat = kpi('Derivados', totalDerivados.toLocaleString('es-CL'))
-      + kpi('Realizadas', totalPrematRealiz.toLocaleString('es-CL'))
-      + kpi('Matriculados', totalMatCapped.toLocaleString('es-CL'))
-      + (pct !== null ? kpi('% Matriculados', pct+'%') : '');
+    const kpisPremat = isSede
+      ? kpi('Derivados', totalDerivados.toLocaleString('es-CL'))
+        + kpi('Realizadas', totalPrematRealiz.toLocaleString('es-CL'))
+        + kpi('Matriculados', totalMatCapped.toLocaleString('es-CL'))
+        + (pct !== null ? kpi('% Matriculados', pct+'%') : '')
+      : kpi('Derivados', totalDerivados.toLocaleString('es-CL'))
+        + kpi('Realizadas', totalPrematRealiz.toLocaleString('es-CL'));
+    const notaPremat = isSede
+      ? 'Derivados = casos asignados para atención (realizadas + no realizadas). Solo cuenta como Matriculado el/la estudiante que figura en el Académico.'
+      : 'Derivados = casos asignados para atención (realizadas + no realizadas). La matrícula depende de la gestión de la sede, no del profesional que hizo el seguimiento — por eso este dato solo se muestra en la vista Por sede.';
     html += `<div class="section">
       <div class="section-title">Prematrícula (seguimiento) por ${dim}</div>
-      <div class="section-note">Derivados = casos asignados para atención (realizadas + no realizadas). Solo cuenta como Matriculado el/la estudiante que figura en el Académico.</div>
+      <div class="section-note">${notaPremat}</div>
       <div class="kpi-row">${kpisPremat}</div>
       <div class="chart-wrap"><canvas id="c_prematricula"></canvas></div>
     </div>`;
@@ -789,7 +795,7 @@ function render() {
     simpleBar('c_consultas', view.Consultas, '#F2B705');
     temaBar('c_tema', temaTotal);
   }
-  if (totalPrematRealiz > 0 || totalMatRaw > 0 || totalNoMat > 0 || totalDerivados > 0) groupedBar('c_prematricula', realizObj, matricObjCapped);
+  if (totalPrematRealiz > 0 || totalMatRaw > 0 || totalNoMat > 0 || totalDerivados > 0) groupedBar('c_prematricula', realizObj, matricObjCapped, isSede);
   if (isSede && totalDe > 0) simpleBar('c_derivaciones', view.Derivaciones, '#C9900A');
 }
 
